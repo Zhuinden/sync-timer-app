@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.zhuinden.synctimer.features.synctimer.SyncTimerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:keepScreenOn="true">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        tools:ignore="UselessParent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textCountdownTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_16sdp"
+                android:layout_marginTop="@dimen/_48sdp"
+                android:layout_marginRight="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_32sdp"
+                android:gravity="center"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                tools:text="200" />
+
+            <TextView
+                android:id="@+id/textStoppedIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:text="Stopped!"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textStopperNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_32sdp"
+                android:gravity="center"
+                android:text="Painis cupcake has stopped the timer!"
+                android:textSize="16sp" />
+
+            <TextView
+                style="@style/ButtonStyle"
+                android:id="@+id/buttonResetTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Reset Timer" />
+
+            <TextView
+                style="@style/ButtonStyle"
+                android:id="@+id/buttonStartTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Start Timer" />
+
+            <TextView
+                style="@style/ButtonStyle"
+                android:id="@+id/buttonPauseTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Pause Timer"
+                android:visibility="gone"/>
+
+            <TextView
+                style="@style/ButtonStyle"
+                android:id="@+id/buttonExitSession"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_32sdp"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Exit Session" />
+        </LinearLayout>
+    </ScrollView>
+</com.zhuinden.synctimer.features.synctimer.SyncTimerView>
