@@ -2,9 +2,11 @@ package com.zhuinden.synctimer.utils
 
 import android.animation.Animator
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.content.SharedPreferences
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -211,4 +213,20 @@ inline fun <reified T> View.lookup(serviceTag: String = T::class.java.name): T =
 // kryo helpers
 inline fun <reified T> Kryo.register() {
     this.register(T::class.java)
+}
+
+// SharedPref helpers
+inline fun SharedPreferences.save(actions: SharedPreferences.Editor.() -> Unit) {
+    this.save(false, actions)
+}
+
+@SuppressLint("ApplySharedPref")
+inline fun SharedPreferences.save(immediate: Boolean, actions: SharedPreferences.Editor.() -> Unit) {
+    this.edit().apply(actions).let { editor ->
+        if (immediate) {
+            editor.commit()
+        } else {
+            editor.apply()
+        }
+    }
 }
