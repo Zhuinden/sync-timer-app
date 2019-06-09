@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/lightColor"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/_32sdp"
+        android:layout_marginRight="@dimen/_32sdp"
+        android:gravity="center"
+        android:text="No one has joined the session yet."
+        android:textSize="24sp"
+        android:textStyle="bold" />
+</FrameLayout>

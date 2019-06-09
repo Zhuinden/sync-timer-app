@@ -19,15 +19,15 @@
 
 package com.esotericsoftware.kryonet;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryonet.FrameworkMessage.Ping;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.nio.channels.SocketChannel;
-
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryonet.FrameworkMessage.Ping;
 
 import static com.esotericsoftware.minlog.Log.*;
 
@@ -44,7 +44,7 @@ public class Connection {
 	UdpConnection udp;
 	InetSocketAddress udpRemoteAddress;
 	private Listener[] listeners = {};
-	private Object listenerLock = new Object();
+    private final Object listenerLock = new Object();
 	private int lastPingID;
 	private long lastPingSendTime;
 	private int returnTripTime;

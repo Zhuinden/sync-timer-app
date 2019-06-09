@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.EditText
 import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
-import com.esotericsoftware.kryo.Kryo
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.synctimer.core.navigation.ViewKey
@@ -209,11 +208,6 @@ inline fun <reified T> Context.lookup(serviceTag: String = T::class.java.name): 
 
 inline fun <reified T> View.lookup(serviceTag: String = T::class.java.name): T =
     context.lookup(serviceTag)
-
-// kryo helpers
-inline fun <reified T> Kryo.register() {
-    this.register(T::class.java)
-}
 
 // SharedPref helpers
 inline fun SharedPreferences.save(actions: SharedPreferences.Editor.() -> Unit) {

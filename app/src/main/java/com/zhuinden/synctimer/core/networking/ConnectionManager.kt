@@ -1,8 +1,10 @@
 package com.zhuinden.synctimer.core.networking
 
+import android.util.Log
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Server
+import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
 import com.zhuinden.synctimer.utils.register
 
 class ConnectionManager {
@@ -42,7 +44,9 @@ class ConnectionManager {
     fun stopServer(): Boolean {
         val server = server
         if (server != null) {
+            Log.i("ConnectionManager", "Stopping server..")
             server.stop()
+            Log.i("ConnectionManager", "Server stopped.")
             this.server = null
             return true
         }
@@ -64,5 +68,6 @@ class ConnectionManager {
         kryo.register<IntArray>()
         kryo.register<LongArray>()
         kryo.register<Array<String>>()
+        kryo.register<JoinSessionCommand>()
     }
 }
