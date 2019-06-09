@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
             .setGlobalServices(
                 GlobalServices.builder()
                     .add(app.settingsManager)
+                    .add(app.connectionManager)
                     .build()
             )
             .setScopedServices(ScopeConfiguration())

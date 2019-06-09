@@ -27,4 +27,9 @@
         <item name="android:background">@drawable/selector_button_background</item>
         <item name="android:gravity">center</item>
     </style>
+
+    <style name="EditTextStyle" parent="android:Widget.EditText">
+        <item name="android:singleLine">true</item>
+        <item name="android:textColorHint">@color/whiteT50</item>
+    </style>
 </resources>

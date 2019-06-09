@@ -42,6 +42,7 @@
 
             <EditText
                 android:id="@+id/inputUsername"
+                style="@style/EditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_32sdp"
@@ -49,8 +50,6 @@
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_16sdp"
                 android:hint="Username"
-                android:singleLine="true"
-                android:textColorHint="@color/whiteT50"
                 app:backgroundTint="@color/whiteT50" />
 
             <Space

@@ -6,12 +6,58 @@ import com.esotericsoftware.kryonet.Server
 import com.zhuinden.synctimer.utils.register
 
 class ConnectionManager {
-    private fun createServer() {
-        val server: Server? = null
-        val client: Client? = null
-        client!!.discoverHost()
+    private var server: Server? = null
+    private var client: Client? = null
+
+    val isServerAvailable: Boolean get() = server != null
+    val isClientAvailable: Boolean get() = client != null
+
+    val activeServer: Server get() = server!!
+    val activeClient: Client get() = client!!
+
+    private val activeConnections: Map<Long, String> = linkedMapOf()
+
+    fun startServer(): Boolean {
+        if (server == null) {
+            val server = Server()
+            this.server = server
+            configureKryo(server.kryo)
+            server.start()
+            return true
+        }
+        return false
     }
 
+    fun startClient(): Boolean {
+        if (client == null) {
+            val client = Client()
+            this.client = client
+            configureKryo(client.kryo)
+            client.start()
+            return true
+        }
+        return false
+    }
+
+    fun stopServer(): Boolean {
+        val server = server
+        if (server != null) {
+            server.stop()
+            this.server = null
+            return true
+        }
+        return false
+    }
+
+    fun stopClient(): Boolean {
+        val client = client
+        if (client != null) {
+            client.stop()
+            this.client = null
+            return true
+        }
+        return false
+    }
 
     private fun configureKryo(kryo: Kryo) {
         kryo.register<FloatArray>()
