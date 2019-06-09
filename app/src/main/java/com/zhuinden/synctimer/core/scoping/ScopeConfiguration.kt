@@ -1,5 +1,6 @@
 package com.zhuinden.synctimer.core.scoping
 
+import com.zhuinden.simplestack.ScopeKey
 import com.zhuinden.simplestack.ScopedServices
 import com.zhuinden.simplestack.ServiceBinder
 
@@ -11,7 +12,9 @@ class ScopeConfiguration : ScopedServices {
         }
     }
 
-    interface HasServices {
+    interface HasServices : ScopeKey {
         fun bindServices(serviceBinder: ServiceBinder)
+
+        override fun getScopeTag(): String = javaClass.name
     }
 }
