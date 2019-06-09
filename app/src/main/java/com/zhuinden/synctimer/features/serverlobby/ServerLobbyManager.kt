@@ -1,22 +1,24 @@
 package com.zhuinden.synctimer.features.serverlobby
 
+import android.annotation.SuppressLint
 import android.os.Parcelable
 import android.util.Log
 import com.esotericsoftware.kryonet.Connection
-import com.esotericsoftware.kryonet.Listener
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
-import com.zhuinden.synctimer.utils.KryonetListener
 import com.zhuinden.synctimer.utils.RxScopedService
-import com.zhuinden.synctimer.utils.addListener
+import com.zhuinden.synctimer.utils.bindToRegistration
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
+import kotlin.collections.set
 
 class ServerLobbyManager(
     private val connectionManager: ConnectionManager,
     private val timerConfiguration: TimerConfiguration
-) : RxScopedService(), KryonetListener {
+) : RxScopedService() {
     @Parcelize
     data class TimerConfiguration(
         val startValue: Int,
@@ -47,7 +49,14 @@ class ServerLobbyManager(
         if (registration == null) {
             connections[connection.id] = ConnectionRegistration(connection, connection.id, username)
         } else {
-            username?.let { registration.username = it }
+            if (username != null) {
+                registration.username = username
+            } else {
+                Log.w(
+                    "ServerLobbyManager",
+                    "Unknown state: unexpected new connection with existing conn ID [${connection.id}] :: [$username]"
+                )
+            }
         }
 
         members[connection.id] = SessionMember(connection.id, username ?: "[Connecting...]")
@@ -60,47 +69,37 @@ class ServerLobbyManager(
         mutableSessions.accept(members.map { it.value })
     }
 
-    private lateinit var listener: Listener
-
+    @SuppressLint("CheckResult")
     override fun onServiceRegistered() {
         super.onServiceRegistered()
         connectionManager.startServer()
 
-        listener = connectionManager.activeServer.addListener(this)
+        connectionManager.commandReceivedEvents.observe { (connection: Connection, command: Any) ->
+            when (command) {
+                is JoinSessionCommand -> {
+                    addConnection(connection, command.username)
+                }
+            }
+        }
+
+        connectionManager.connectedEvents.observe { (connection: Connection) ->
+            addConnection(connection, null)
+        }
+
+        connectionManager.disconnectedEvents.observe { (connection: Connection) ->
+            removeConnection(connection)
+        }
     }
 
     override fun onServiceUnregistered() {
         super.onServiceUnregistered()
-        connectionManager.activeServer.removeListener(listener)
-
-        connectionManager.stopServer() // TODO: this freezes the UI thread for 10 seconds, LOL
+        connectionManager.stopServer()
     }
 
-    override fun connected(connection: Connection) {
-        val registration = connections[connection.id]
-        if (registration == null) {
-            connections[connection.id] = ConnectionRegistration(connection, connection.id, null)
-        } else {
-            Log.w("ServerLobbyManager", "Unknown state: unexpected new connection with existing conn. ID")
-        }
-    }
-
-    override fun disconnected(connection: Connection) {
-        removeConnection(connection)
-    }
-
-    override fun received(connection: Connection, command: Any) {
-        when (command) {
-            is JoinSessionCommand -> {
-                addConnection(connection, command.username)
-            }
-            else -> {
-                throw IllegalArgumentException("${command.javaClass.simpleName} not handled yet")
-            }
-        }
-    }
-
-    override fun idle(connection: Connection) {
-        // i wonder what to do here?
-    }
+    private fun <T : Any> Observable<T>.observe(eventListener: (T) -> Unit) =
+        this.bindToRegistration(this@ServerLobbyManager)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onNext = { event ->
+                eventListener.invoke(event)
+            })
 }

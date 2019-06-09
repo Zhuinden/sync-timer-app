@@ -1,66 +1,144 @@
 package com.zhuinden.synctimer.core.networking
 
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.Log
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Client
+import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Server
+import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
+import com.zhuinden.synctimer.utils.KryonetListener
 import com.zhuinden.synctimer.utils.register
+import io.reactivex.Observable
+import io.reactivex.Scheduler
+import io.reactivex.android.schedulers.AndroidSchedulers
+import java.util.concurrent.atomic.AtomicReference
 
-class ConnectionManager {
-    private var server: Server? = null
-    private var client: Client? = null
-
-    val isServerAvailable: Boolean get() = server != null
-    val isClientAvailable: Boolean get() = client != null
-
-    val activeServer: Server get() = server!!
-    val activeClient: Client get() = client!!
-
-    private val activeConnections: Map<Long, String> = linkedMapOf()
-
-    fun startServer(): Boolean {
-        if (server == null) {
-            val server = Server()
-            this.server = server
-            configureKryo(server.kryo)
-            server.start()
-            return true
-        }
-        return false
+class ConnectionManager : KryonetListener {
+    companion object {
+        const val TAG = "ConnectionManager"
     }
 
-    fun startClient(): Boolean {
-        if (client == null) {
-            val client = Client()
-            this.client = client
-            configureKryo(client.kryo)
-            client.start()
-            return true
-        }
-        return false
+    data class ConnectedEvent(val connection: Connection)
+    data class DisconnectedEvent(val connection: Connection)
+    data class CommandReceivedEvent(val connection: Connection, val command: Any)
+    data class IdleEvent(val connection: Connection)
+
+    private val mutableConnectedEvents: PublishRelay<ConnectedEvent> = PublishRelay.create()
+    private val mutableDisconnectedEvents: PublishRelay<DisconnectedEvent> = PublishRelay.create()
+    private val mutableCommandReceivedEvents: PublishRelay<CommandReceivedEvent> = PublishRelay.create()
+    private val mutableIdleEvents: PublishRelay<IdleEvent> = PublishRelay.create()
+
+    val connectedEvents: Observable<ConnectedEvent> = mutableConnectedEvents
+    val disconnectedEvents: Observable<DisconnectedEvent> = mutableDisconnectedEvents
+    val commandReceivedEvents: Observable<CommandReceivedEvent> = mutableCommandReceivedEvents
+    val idleEvents: Observable<IdleEvent> = mutableIdleEvents
+
+    private val mutableIsServerBeingStopped: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
+    val isServerBeingStopped: Observable<Boolean> = mutableIsServerBeingStopped
+
+    override fun connected(connection: Connection) {
+        mutableConnectedEvents.accept(ConnectedEvent(connection))
     }
 
-    fun stopServer(): Boolean {
-        val server = server
-        if (server != null) {
-            Log.i("ConnectionManager", "Stopping server..")
-            server.stop()
-            Log.i("ConnectionManager", "Server stopped.")
-            this.server = null
-            return true
-        }
-        return false
+    override fun disconnected(connection: Connection) {
+        mutableDisconnectedEvents.accept(DisconnectedEvent(connection))
     }
 
-    fun stopClient(): Boolean {
-        val client = client
-        if (client != null) {
-            client.stop()
-            this.client = null
-            return true
+    override fun received(connection: Connection, command: Any) {
+        mutableCommandReceivedEvents.accept(CommandReceivedEvent(connection, command))
+    }
+
+    override fun idle(connection: Connection) {
+        mutableIdleEvents.accept(IdleEvent(connection))
+    }
+
+    private val looperThread: HandlerThread = HandlerThread("CONNECTION-MANAGER[${hashCode()}]")
+    private val handler: Handler
+    val scheduler: Scheduler
+
+    init {
+        looperThread.start()
+
+        synchronized(looperThread) {
+            val looper = looperThread.looper
+            handler = Handler(looper)
+            scheduler = AndroidSchedulers.from(looper)
         }
-        return false
+    }
+
+    private val server: AtomicReference<Server?> = AtomicReference()
+    private val client: AtomicReference<Client?> = AtomicReference()
+
+    private val serverStart = Runnable {
+        synchronized(this) {
+            val currentServer = server.get()
+            if (currentServer == null) {
+                val server = Server()
+                this.server.set(server)
+                configureKryo(server.kryo)
+                Log.i(TAG, "Starting server")
+                server.start()
+                Log.i(TAG, "Server started")
+            }
+        }
+    }
+
+    fun startServer() {
+        handler.post(serverStart)
+    }
+
+    private val clientStart = Runnable {
+        synchronized(this) {
+            val currentClient = client.get()
+            if (currentClient == null) {
+                val client = Client()
+                this.client.set(client)
+                configureKryo(client.kryo)
+                Log.i(TAG, "Starting client")
+                client.start()
+                Log.i(TAG, "Client started")
+            }
+        }
+    }
+
+    fun startClient() {
+        handler.post(clientStart)
+    }
+
+    private val serverStop = Runnable {
+        synchronized(this) {
+            val server = server.getAndSet(null)
+            if (server != null) {
+                Log.i(TAG, "Stopping server")
+                mutableIsServerBeingStopped.accept(true)
+                server.stop()
+                mutableIsServerBeingStopped.accept(false)
+                Log.i(TAG, "Server stopped")
+            }
+        }
+    }
+
+    fun stopServer() {
+        handler.post(serverStop)
+    }
+
+    private val clientStop = Runnable {
+        synchronized(this) {
+            val client = client.getAndSet(null)
+            if (client != null) {
+                Log.i(TAG, "Stopping client")
+                client.stop()
+                Log.i(TAG, "Client stopped")
+            }
+        }
+    }
+
+    fun stopClient() {
+        handler.post(clientStop)
     }
 
     private fun configureKryo(kryo: Kryo) {

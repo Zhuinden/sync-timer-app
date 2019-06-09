@@ -4,12 +4,13 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.settings.SettingsManager
 import com.zhuinden.synctimer.features.serverlobby.ServerLobbyKey
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.lookup
-import com.zhuinden.synctimer.utils.onClick
-import com.zhuinden.synctimer.utils.onTextChanged
+import com.zhuinden.synctimer.utils.*
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.create_session_view.view.*
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
@@ -26,6 +27,7 @@ class CreateSessionView : FrameLayout {
     )
 
     private val settingsManager by lazy { lookup<SettingsManager>() }
+    private val connectionManager by lazy { lookup<ConnectionManager>() }
 
     private var startValue: Int = 0
     private var endValue: Int = 0
@@ -79,5 +81,27 @@ class CreateSessionView : FrameLayout {
         buttonCreateSession.onClick {
             backstack.goTo(ServerLobbyKey(startValue, endValue, decreaseStep, decreaseInterval))
         }
+    }
+
+    private val compositeDisposable = CompositeDisposable()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (isInEditMode) return
+
+        compositeDisposable += connectionManager.isServerBeingStopped
+            .onUI()
+            .subscribeBy { isServerBeingStopped ->
+                buttonCreateSession.isEnabled = !isServerBeingStopped
+            }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        if (isInEditMode) return
+
+        compositeDisposable.clear()
     }
 }
