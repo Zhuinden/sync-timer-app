@@ -6,5 +6,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class ClientLobbyKey(private val placeholder: String = "") : ViewKey {
-    override fun layout(): Int = R.layout.server_lobby_view
+    override fun layout(): Int = R.layout.client_lobby_view
 }

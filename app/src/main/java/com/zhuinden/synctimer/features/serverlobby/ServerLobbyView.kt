@@ -32,10 +32,18 @@ class ServerLobbyView : FrameLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
 
+        if (isInEditMode) return
+
         recyclerSessionMembers.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         buttonBlahGoToTimer.onClick {
             backstack.goTo(SyncTimerKey())
+        }
+
+        textHostIpAddress.text = serverLobbyManager.getNextIp()
+
+        buttonNextIpAddress.onClick {
+            textHostIpAddress.text = serverLobbyManager.getNextIp()
         }
     }
 

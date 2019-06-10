@@ -14,12 +14,17 @@ import com.zhuinden.synctimer.utils.KryonetListener
 import com.zhuinden.synctimer.utils.register
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import java.net.InetAddress
 import java.util.concurrent.atomic.AtomicReference
 
 class ConnectionManager : KryonetListener {
     companion object {
         const val TAG = "ConnectionManager"
+
+        const val TCP_PORT = 4000
+        const val UDP_PORT = 5555
     }
 
     data class ConnectedEvent(val connection: Connection)
@@ -83,6 +88,7 @@ class ConnectionManager : KryonetListener {
                 Log.i(TAG, "Starting server")
                 server.start()
                 Log.i(TAG, "Server started")
+                server.bind(TCP_PORT, UDP_PORT)
             }
         }
     }
@@ -147,5 +153,49 @@ class ConnectionManager : KryonetListener {
         kryo.register<LongArray>()
         kryo.register<Array<String>>()
         kryo.register<JoinSessionCommand>()
+    }
+
+    fun connectClientTo(ipV4Address: String): Single<Unit> = Single.create { emitter ->
+        handler.post {
+            synchronized(this) {
+                val client = client.get()
+                if (client == null) {
+                    emitter.onError(IllegalStateException("Client was not started"))
+                    return@synchronized
+                }
+
+                try {
+                    client.connect(5000, ipV4Address, TCP_PORT)
+                    emitter.onSuccess(Unit)
+                } catch (e: Throwable) {
+                    emitter.onError(e)
+                    return@synchronized
+                }
+            }
+        }
+    }
+
+    fun searchHostViaBroadcast(): Single<InetAddress> = Single.create { emitter ->
+        handler.post {
+            synchronized(this) {
+                val client = client.get()
+                if (client == null) {
+                    emitter.onError(IllegalStateException("Client was not started"))
+                    return@synchronized
+                }
+
+                try {
+                    val host = client.discoverHost(UDP_PORT, 5000)
+                    if (host == null) {
+                        emitter.onError(IllegalStateException("Could not find host"))
+                    } else {
+                        emitter.onSuccess(host)
+                    }
+                } catch (e: Throwable) {
+                    emitter.onError(e)
+                    return@synchronized
+                }
+            }
+        }
     }
 }

@@ -9,10 +9,14 @@ import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
+import com.zhuinden.synctimer.utils.onUI
 import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
+import java.net.InetAddress
+import java.net.NetworkInterface
+import java.net.SocketException
+import java.util.*
 import kotlin.collections.set
 
 class ServerLobbyManager(
@@ -72,22 +76,25 @@ class ServerLobbyManager(
     @SuppressLint("CheckResult")
     override fun onServiceRegistered() {
         super.onServiceRegistered()
-        connectionManager.startServer()
 
-        connectionManager.commandReceivedEvents.observe { (connection: Connection, command: Any) ->
-            when (command) {
-                is JoinSessionCommand -> {
-                    addConnection(connection, command.username)
+        with(connectionManager) {
+            startServer()
+
+            commandReceivedEvents.observe { (connection: Connection, command: Any) ->
+                when (command) {
+                    is JoinSessionCommand -> {
+                        addConnection(connection, command.username)
+                    }
                 }
             }
-        }
 
-        connectionManager.connectedEvents.observe { (connection: Connection) ->
-            addConnection(connection, null)
-        }
+            connectedEvents.observe { (connection: Connection) ->
+                addConnection(connection, null)
+            }
 
-        connectionManager.disconnectedEvents.observe { (connection: Connection) ->
-            removeConnection(connection)
+            disconnectedEvents.observe { (connection: Connection) ->
+                removeConnection(connection)
+            }
         }
     }
 
@@ -96,10 +103,44 @@ class ServerLobbyManager(
         connectionManager.stopServer()
     }
 
-    private fun <T : Any> Observable<T>.observe(eventListener: (T) -> Unit) =
+    private inline fun <T : Any> Observable<T>.observe(crossinline eventListener: (T) -> Unit) =
         this.bindToRegistration(this@ServerLobbyManager)
-            .observeOn(AndroidSchedulers.mainThread())
+            .onUI()
             .subscribeBy(onNext = { event ->
                 eventListener.invoke(event)
             })
+
+    // can I really trust this? I have no idea lol
+    private var networkInterfaces: Enumeration<NetworkInterface>? = null
+    private var networkAddresses: Enumeration<InetAddress>? = null
+
+    fun getNextIp(): String {
+        try {
+            while (true) {
+                if (this.networkInterfaces == null) {
+                    networkInterfaces = NetworkInterface.getNetworkInterfaces()
+                }
+                if (networkAddresses == null || !networkAddresses!!.hasMoreElements()) {
+                    if (networkInterfaces!!.hasMoreElements()) {
+                        val networkInterface = networkInterfaces!!.nextElement()
+                        networkAddresses = networkInterface.inetAddresses
+                    } else {
+                        networkInterfaces = null
+                    }
+                } else {
+                    if (networkAddresses!!.hasMoreElements()) {
+                        val address = networkAddresses!!.nextElement().hostAddress
+                        if (address.contains(".")) {
+                            return address
+                        }
+                    } else {
+                        networkAddresses = null
+                    }
+                }
+            }
+        } catch (e: SocketException) {
+            e.printStackTrace()
+        }
+        return ""
+    }
 }

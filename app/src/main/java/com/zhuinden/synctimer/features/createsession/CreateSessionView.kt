@@ -37,9 +37,7 @@ class CreateSessionView : FrameLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        if (isInEditMode) {
-            return
-        }
+        if (isInEditMode) return
 
         startValue = settingsManager.getStartValue()
         endValue = settingsManager.getEndValue()

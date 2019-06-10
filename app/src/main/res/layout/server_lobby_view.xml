@@ -21,10 +21,51 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_32sdp"
-                android:layout_marginBottom="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_16sdp"
                 android:text="Creating Session..."
                 android:textSize="32dp"
                 android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_16sdp"
+                android:layout_marginBottom="@dimen/_32sdp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="My IP:"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:textSize="20sp"
+                    android:layout_marginRight="@dimen/_8sdp" />
+
+                <TextView
+                    android:id="@+id/textHostIpAddress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="@dimen/_8sdp"
+                    android:layout_marginRight="@dimen/_8sdp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:minWidth="@dimen/_96sdp"
+                    tools:text="127.0.0.1" />
+
+                <TextView
+                    style="@style/ButtonStyle"
+                    android:id="@+id/buttonNextIpAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/_16sdp"
+                    android:paddingRight="@dimen/_16sdp"
+                    android:paddingTop="@dimen/_8sdp"
+                    android:paddingBottom="@dimen/_8sdp"
+                    android:text="Next" />
+            </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerSessionMembers"
