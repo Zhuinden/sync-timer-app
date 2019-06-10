@@ -1,3 +1,10 @@
+/*
+ * Created in 2019 by Gabor Varadi
+ *
+ * You may not use this file except in compliance with the license.
+ *
+ * The license says: "please don't release this app as is under your own name, thanks".
+ */
 package com.zhuinden.synctimer.core.networking
 
 import android.os.Handler
@@ -162,7 +169,7 @@ class ConnectionManager {
                 }
 
                 try {
-                    client.connect(5000, ipV4Address, TCP_PORT, UDP_PORT) // 6000, 6555 is for emulators only
+                    client.connect(5000, ipV4Address, 6000, 6555) // 6000, 6555 is for emulators only
                     emitter.onSuccess(Unit)
                 } catch (e: Throwable) {
                     emitter.onError(e)
