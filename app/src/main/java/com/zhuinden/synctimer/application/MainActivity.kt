@@ -6,6 +6,7 @@ import com.zhuinden.simplestack.GlobalServices
 import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.synctimer.R
+import com.zhuinden.synctimer.core.navigation.BackHandler
 import com.zhuinden.synctimer.core.scoping.ScopeConfiguration
 import com.zhuinden.synctimer.features.splash.SplashKey
 import com.zhuinden.synctimer.utils.add
@@ -30,6 +31,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        val view = root.getChildAt(0)
+        if (view is BackHandler) {
+            val handled = view.onBackPressed()
+            if (handled) {
+                return
+            }
+        }
         if (!Navigator.onBackPressed(this)) {
             super.onBackPressed()
         }
