@@ -6,9 +6,12 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zhuinden.simplestack.StateChange
+import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.*
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.plusAssign
+import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.sync_timer_view.view.*
 
 class SyncTimerView : FrameLayout, BackHandler {
@@ -22,6 +25,8 @@ class SyncTimerView : FrameLayout, BackHandler {
         defStyleAttr,
         defStyleRes
     )
+
+    private val syncTimerManager by lazy { lookup<SyncTimerManager>() }
 
     private fun showLeavingAlert() {
         AlertDialog.Builder(context)
@@ -37,9 +42,40 @@ class SyncTimerView : FrameLayout, BackHandler {
     override fun onFinishInflate() {
         super.onFinishInflate()
 
+        if (isInEditMode) return
+
         buttonExitSession.onClick {
             showLeavingAlert()
         }
+    }
+
+    private val compositeDisposable = CompositeDisposable()
+    private val compositeNotificationToken = CompositeNotificationToken()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        if (isInEditMode) return
+
+        compositeDisposable += syncTimerManager.currentTime
+            .subscribeBy { currentTime ->
+                textCountdownTime.text = "${currentTime}"
+            }
+
+        compositeNotificationToken += syncTimerManager.hostDisconnectedEvent
+            .startListening { _ ->
+                showLongToast(R.string.alert_host_disconnected)
+                backstack.jumpToRoot(StateChange.REPLACE) // TODO: this belongs in managers, but right now it'd be duplicate events
+            }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        if (isInEditMode) return
+
+        compositeDisposable.clear()
+        compositeNotificationToken.stopListening()
     }
 
     override fun onBackPressed(): Boolean {

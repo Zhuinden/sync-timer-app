@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.StringRes
 import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
@@ -24,6 +25,30 @@ fun Context.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
 
 fun View.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
     context.showToast(text, duration)
+}
+
+fun Context.showToast(@StringRes stringRes: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, getString(stringRes), duration).show()
+}
+
+fun View.showToast(@StringRes stringRes: Int, duration: Int = Toast.LENGTH_SHORT) {
+    context.showToast(stringRes, duration)
+}
+
+fun Context.showLongToast(text: String) {
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+}
+
+fun View.showLongToast(text: String) {
+    context.showLongToast(text)
+}
+
+fun Context.showLongToast(@StringRes stringRes: Int) {
+    Toast.makeText(this, getString(stringRes), Toast.LENGTH_LONG).show()
+}
+
+fun View.showLongToast(@StringRes stringRes: Int) {
+    context.showLongToast(stringRes)
 }
 
 tailrec fun <T : Activity> Context.findActivity(): T {

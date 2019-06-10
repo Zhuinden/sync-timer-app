@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.zhuinden.synctimer.core.navigation.BackHandler
+import com.zhuinden.synctimer.core.networking.SessionType
 import com.zhuinden.synctimer.features.synctimer.SyncTimerKey
 import com.zhuinden.synctimer.utils.*
 import io.reactivex.disposables.CompositeDisposable
@@ -39,12 +40,12 @@ class ServerLobbyView : FrameLayout, BackHandler {
         recyclerSessionMembers.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
         buttonStartTimer.onClick {
+            // TODO: this all belongs outside of the view
             serverLobbyManager.startTimer(failure = { err ->
-                // TODO: this all belongs outside of the view
                 showToast("Could not start all timers. Aborting...")
                 backstack.jumpToRoot()
             }, success = {
-                backstack.goTo(SyncTimerKey(SyncTimerKey.SessionType.SERVER))
+                backstack.goTo(SyncTimerKey(SessionType.SERVER, serverLobbyManager.timerConfiguration))
             })
         }
 

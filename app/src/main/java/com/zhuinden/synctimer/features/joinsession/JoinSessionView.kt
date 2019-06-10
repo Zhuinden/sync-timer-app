@@ -6,6 +6,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.util.Patterns
 import android.widget.FrameLayout
+import com.zhuinden.simplestack.StateChange
+import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.features.clientlobby.ClientLobbyKey
 import com.zhuinden.synctimer.utils.*
 import io.reactivex.disposables.CompositeDisposable
@@ -74,15 +76,23 @@ class JoinSessionView : FrameLayout {
         }
     }
 
+    private val compositeNotificationToken = CompositeNotificationToken()
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         isAttached = true
+
+        compositeNotificationToken += joinSessionManager.hostDisconnectedEvent.startListening {
+            showLongToast(R.string.alert_host_disconnected)
+            backstack.jumpToRoot(StateChange.REPLACE) // TODO: this belongs in managers, but right now it'd be duplicate events
+        }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         isAttached = false
 
+        compositeNotificationToken.stopListening()
         compositeDisposable.clear()
     }
 }

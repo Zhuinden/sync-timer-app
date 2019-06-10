@@ -3,8 +3,11 @@ package com.zhuinden.synctimer.features.joinsession
 import android.annotation.SuppressLint
 import com.esotericsoftware.kryonet.Connection
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.zhuinden.eventemitter.EventEmitter
+import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.simplestack.Backstack
 import com.zhuinden.synctimer.core.networking.ConnectionManager
+import com.zhuinden.synctimer.core.networking.SessionType
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
 import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand
 import com.zhuinden.synctimer.core.settings.SettingsManager
@@ -24,8 +27,14 @@ class JoinSessionManager(
     @SuppressLint("CheckResult")
     private var hostConnectionId: Int = -1
 
+    private val mutableIsConnected: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
+    val isConnected: Observable<Boolean> = mutableIsConnected
+
     private val mutableHostUsername: BehaviorRelay<String> = BehaviorRelay.create()
     val hostUsername: Observable<String> = mutableHostUsername
+
+    private val mutableHostDisconnectedEvent: EventEmitter<Unit> = EventEmitter()
+    val hostDisconnectedEvent: EventSource<Unit> = mutableHostDisconnectedEvent
 
     @SuppressLint("CheckResult")
     override fun onServiceRegistered() {
@@ -43,6 +52,7 @@ class JoinSessionManager(
                 connectionManager.handler.post {
                     connectionManager.activeClient.sendTCP(JoinSessionCommand(username))
                 }
+                mutableIsConnected.accept(true)
             }
 
         connectionManager.disconnectedEvents
@@ -52,6 +62,7 @@ class JoinSessionManager(
                 if (hostConnectionId == connection.id) {
                     hostConnectionId = -1
                     mutableHostUsername.accept("")
+                    mutableIsConnected.accept(false)
                 }
             }
 
@@ -64,8 +75,15 @@ class JoinSessionManager(
                         mutableHostUsername.accept(command.username)
                     }
                     if (command is StartSessionCommand) {
-                        backstack.goTo(SyncTimerKey(SyncTimerKey.SessionType.CLIENT))
+                        backstack.goTo(SyncTimerKey(SessionType.CLIENT, command.timerConfiguration))
                     }
+                }
+            }
+
+        isConnected.bindToRegistration(this)
+            .subscribeBy { connected ->
+                if (!connected) {
+                    mutableHostDisconnectedEvent.emit(Unit)
                 }
             }
     }

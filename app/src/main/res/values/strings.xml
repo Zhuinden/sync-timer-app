@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SyncTimer</string>
+    <string name="alert_host_disconnected">The host disconnected. Aborting session.</string>
 </resources>

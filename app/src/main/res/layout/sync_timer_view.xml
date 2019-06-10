@@ -25,9 +25,9 @@
                 android:layout_marginLeft="@dimen/_16sdp"
                 android:layout_marginTop="@dimen/_48sdp"
                 android:layout_marginRight="@dimen/_16sdp"
-                android:layout_marginBottom="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_24sdp"
                 android:gravity="center"
-                android:textSize="32sp"
+                android:textSize="48sp"
                 android:textStyle="bold"
                 tools:text="200" />
 
@@ -39,9 +39,9 @@
                 android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
-                android:text="Stopped!"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="Stopped!" />
 
             <TextView
                 android:id="@+id/textStopperNameText"
@@ -52,53 +52,53 @@
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_32sdp"
                 android:gravity="center"
-                android:text="Painis cupcake has stopped the timer!"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:text="Painis cupcake has stopped the timer!" />
 
             <TextView
-                style="@style/ButtonStyle"
-                android:id="@+id/buttonResetTimer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
-                android:layout_marginLeft="@dimen/_32sdp"
-                android:layout_marginRight="@dimen/_32sdp"
-                android:layout_marginBottom="@dimen/_8sdp"
-                android:minWidth="@dimen/_160sdp"
-                android:text="Reset Timer" />
-
-            <TextView
-                style="@style/ButtonStyle"
                 android:id="@+id/buttonStartTimer"
+                style="@style/ButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:minWidth="@dimen/_160sdp"
                 android:text="Start Timer" />
 
             <TextView
+                android:id="@+id/buttonResetTimer"
                 style="@style/ButtonStyle"
-                android:id="@+id/buttonPauseTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Reset Timer" />
+
+            <TextView
+                android:id="@+id/buttonPauseTimer"
+                style="@style/ButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:minWidth="@dimen/_160sdp"
                 android:text="Pause Timer"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
-                style="@style/ButtonStyle"
                 android:id="@+id/buttonExitSession"
+                style="@style/ButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_32sdp"
                 android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_32sdp"
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_16sdp"
                 android:minWidth="@dimen/_160sdp"

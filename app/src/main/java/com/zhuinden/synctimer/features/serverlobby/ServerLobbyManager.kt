@@ -1,7 +1,6 @@
 package com.zhuinden.synctimer.features.serverlobby
 
 import android.annotation.SuppressLint
-import android.os.Parcelable
 import android.util.Log
 import com.esotericsoftware.kryonet.Connection
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -9,13 +8,14 @@ import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
 import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand
 import com.zhuinden.synctimer.core.settings.SettingsManager
+
+import com.zhuinden.synctimer.core.timer.TimerConfiguration
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
 import com.zhuinden.synctimer.utils.observeOnMain
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.parcel.Parcelize
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -25,17 +25,9 @@ import kotlin.collections.set
 class ServerLobbyManager(
     private val settingsManager: SettingsManager,
     private val connectionManager: ConnectionManager,
-    private val timerConfiguration: TimerConfiguration
+    val timerConfiguration: TimerConfiguration
 ) : RxScopedService() {
     val hostUsername: String = settingsManager.getUsername()!!
-
-    @Parcelize
-    data class TimerConfiguration(
-        val startValue: Int,
-        val endValue: Int,
-        val decreaseStep: Int,
-        val decreaseInterval: Int
-    ) : Parcelable
 
     private class ConnectionRegistration(
         var connection: Connection,

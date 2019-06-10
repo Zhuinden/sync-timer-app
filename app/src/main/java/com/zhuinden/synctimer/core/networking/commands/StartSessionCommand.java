@@ -1,6 +1,8 @@
 package com.zhuinden.synctimer.core.networking.commands;
 
-import com.zhuinden.synctimer.features.serverlobby.ServerLobbyManager;
+import com.zhuinden.synctimer.core.timer.TimerConfiguration;
+
+;
 
 public class StartSessionCommand {
     public int startValue;
@@ -11,10 +13,14 @@ public class StartSessionCommand {
     public StartSessionCommand() {
     }
 
-    public StartSessionCommand(ServerLobbyManager.TimerConfiguration timerConfiguration) {
+    public StartSessionCommand(TimerConfiguration timerConfiguration) {
         this.startValue = timerConfiguration.getStartValue();
         this.endValue = timerConfiguration.getEndValue();
         this.decreaseStep = timerConfiguration.getDecreaseStep();
         this.decreaseInterval = timerConfiguration.getDecreaseInterval();
+    }
+
+    public TimerConfiguration getTimerConfiguration() {
+        return new TimerConfiguration(startValue, endValue, decreaseStep, decreaseInterval);
     }
 }
