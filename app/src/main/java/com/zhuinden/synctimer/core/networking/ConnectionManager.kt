@@ -161,7 +161,7 @@ class ConnectionManager : KryonetListener {
                 }
 
                 try {
-                    client.connect(5000, ipV4Address, 6000, 6555)
+                    client.connect(5000, ipV4Address, TCP_PORT, UDP_PORT) // 6000, 6555 is for emulators only
                     emitter.onSuccess(Unit)
                 } catch (e: Throwable) {
                     emitter.onError(e)
