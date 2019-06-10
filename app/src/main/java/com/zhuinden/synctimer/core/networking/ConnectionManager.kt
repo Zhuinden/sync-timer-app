@@ -3,15 +3,14 @@ package com.zhuinden.synctimer.core.networking
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
-import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Server
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
-import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
+import com.zhuinden.synctimer.utils.KryoHelper
 import com.zhuinden.synctimer.utils.KryonetListener
-import com.zhuinden.synctimer.utils.register
+import com.zhuinden.synctimer.utils.addListener
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single
@@ -62,7 +61,7 @@ class ConnectionManager : KryonetListener {
     }
 
     private val looperThread: HandlerThread = HandlerThread("CONNECTION-MANAGER[${hashCode()}]")
-    private val handler: Handler
+    val handler: Handler
     val scheduler: Scheduler
 
     init {
@@ -78,17 +77,21 @@ class ConnectionManager : KryonetListener {
     private val server: AtomicReference<Server?> = AtomicReference()
     private val client: AtomicReference<Client?> = AtomicReference()
 
+    val activeServer: Server get() = server.get()!!
+    val activeClient: Client get() = client.get()!!
+
     private val serverStart = Runnable {
         synchronized(this) {
             val currentServer = server.get()
             if (currentServer == null) {
                 val server = Server()
                 this.server.set(server)
-                configureKryo(server.kryo)
+                KryoHelper.configureKryo(server.kryo)
                 Log.i(TAG, "Starting server")
                 server.start()
                 Log.i(TAG, "Server started")
                 server.bind(TCP_PORT, UDP_PORT)
+                server.addListener(this)
             }
         }
     }
@@ -103,10 +106,11 @@ class ConnectionManager : KryonetListener {
             if (currentClient == null) {
                 val client = Client()
                 this.client.set(client)
-                configureKryo(client.kryo)
+                KryoHelper.configureKryo(client.kryo)
                 Log.i(TAG, "Starting client")
                 client.start()
                 Log.i(TAG, "Client started")
+                client.addListener(this)
             }
         }
     }
@@ -147,14 +151,6 @@ class ConnectionManager : KryonetListener {
         handler.post(clientStop)
     }
 
-    private fun configureKryo(kryo: Kryo) {
-        kryo.register<FloatArray>()
-        kryo.register<IntArray>()
-        kryo.register<LongArray>()
-        kryo.register<Array<String>>()
-        kryo.register<JoinSessionCommand>()
-    }
-
     fun connectClientTo(ipV4Address: String): Single<Unit> = Single.create { emitter ->
         handler.post {
             synchronized(this) {
@@ -165,7 +161,7 @@ class ConnectionManager : KryonetListener {
                 }
 
                 try {
-                    client.connect(5000, ipV4Address, TCP_PORT)
+                    client.connect(5000, ipV4Address, 6000, 6555)
                     emitter.onSuccess(Unit)
                 } catch (e: Throwable) {
                     emitter.onError(e)

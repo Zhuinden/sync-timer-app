@@ -14,7 +14,7 @@ data class JoinSessionKey(private val placeholder: String = "") : ViewKey, Scope
 
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
-            add(JoinSessionManager(lookup()))
+            add(JoinSessionManager(lookup(), lookup()))
         }
     }
 }

@@ -4,10 +4,6 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
-import com.zhuinden.synctimer.features.synctimer.SyncTimerKey
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.onClick
-import kotlinx.android.synthetic.main.client_lobby_view.view.*
 
 class ClientLobbyView : FrameLayout {
     constructor(context: Context) : super(context)
@@ -23,9 +19,5 @@ class ClientLobbyView : FrameLayout {
 
     override fun onFinishInflate() {
         super.onFinishInflate()
-
-        buttonBlahGoToTimer.onClick {
-            backstack.goTo(SyncTimerKey())
-        }
     }
 }
