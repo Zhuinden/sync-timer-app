@@ -8,7 +8,6 @@ import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.Server
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
-import com.zhuinden.synctimer.utils.KryoHelper
 import com.zhuinden.synctimer.utils.KryonetListener
 import com.zhuinden.synctimer.utils.addListener
 import io.reactivex.Observable

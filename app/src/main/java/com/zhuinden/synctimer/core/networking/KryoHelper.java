@@ -1,4 +1,4 @@
-package com.zhuinden.synctimer.utils;
+package com.zhuinden.synctimer.core.networking;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand;
