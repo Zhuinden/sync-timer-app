@@ -24,7 +24,7 @@ data class ServerLobbyKey(
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             val key = serviceBinder.getKey<ServerLobbyKey>()
-            add(ServerLobbyManager(lookup(), key.timerConfiguration))
+            add(ServerLobbyManager(lookup(), lookup(), key.timerConfiguration))
         }
     }
 }

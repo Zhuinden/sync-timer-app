@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Connection
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
+import com.zhuinden.synctimer.core.settings.SettingsManager
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
 import com.zhuinden.synctimer.utils.onUI
@@ -20,9 +21,12 @@ import java.util.*
 import kotlin.collections.set
 
 class ServerLobbyManager(
+    private val settingsManager: SettingsManager,
     private val connectionManager: ConnectionManager,
     private val timerConfiguration: TimerConfiguration
 ) : RxScopedService() {
+    val hostUsername: String = settingsManager.getUsername()!!
+
     @Parcelize
     data class TimerConfiguration(
         val startValue: Int,
@@ -84,6 +88,11 @@ class ServerLobbyManager(
                 when (command) {
                     is JoinSessionCommand -> {
                         addConnection(connection, command.username)
+
+                        val connectionId = connection.id
+                        connectionManager.handler.post {
+                            connectionManager.activeServer.sendToTCP(connectionId, JoinSessionCommand(hostUsername))
+                        }
                     }
                 }
             }

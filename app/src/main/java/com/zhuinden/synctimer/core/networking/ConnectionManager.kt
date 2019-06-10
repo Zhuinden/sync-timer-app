@@ -17,7 +17,25 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import java.net.InetAddress
 import java.util.concurrent.atomic.AtomicReference
 
-class ConnectionManager : KryonetListener {
+class ConnectionManager {
+    private val kryonetListener = object : KryonetListener {
+        override fun connected(connection: Connection) {
+            mutableConnectedEvents.accept(ConnectedEvent(connection))
+        }
+
+        override fun disconnected(connection: Connection) {
+            mutableDisconnectedEvents.accept(DisconnectedEvent(connection))
+        }
+
+        override fun received(connection: Connection, command: Any) {
+            mutableCommandReceivedEvents.accept(CommandReceivedEvent(connection, command))
+        }
+
+        override fun idle(connection: Connection) {
+            mutableIdleEvents.accept(IdleEvent(connection))
+        }
+    }
+
     companion object {
         const val TAG = "ConnectionManager"
 
@@ -42,22 +60,6 @@ class ConnectionManager : KryonetListener {
 
     private val mutableIsServerBeingStopped: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
     val isServerBeingStopped: Observable<Boolean> = mutableIsServerBeingStopped
-
-    override fun connected(connection: Connection) {
-        mutableConnectedEvents.accept(ConnectedEvent(connection))
-    }
-
-    override fun disconnected(connection: Connection) {
-        mutableDisconnectedEvents.accept(DisconnectedEvent(connection))
-    }
-
-    override fun received(connection: Connection, command: Any) {
-        mutableCommandReceivedEvents.accept(CommandReceivedEvent(connection, command))
-    }
-
-    override fun idle(connection: Connection) {
-        mutableIdleEvents.accept(IdleEvent(connection))
-    }
 
     private val looperThread: HandlerThread = HandlerThread("CONNECTION-MANAGER[${hashCode()}]")
     val handler: Handler
@@ -90,7 +92,7 @@ class ConnectionManager : KryonetListener {
                 server.start()
                 Log.i(TAG, "Server started")
                 server.bind(TCP_PORT, UDP_PORT)
-                server.addListener(this)
+                server.addListener(kryonetListener)
             }
         }
     }
@@ -109,7 +111,7 @@ class ConnectionManager : KryonetListener {
                 Log.i(TAG, "Starting client")
                 client.start()
                 Log.i(TAG, "Client started")
-                client.addListener(this)
+                client.addListener(kryonetListener)
             }
         }
     }
@@ -160,7 +162,7 @@ class ConnectionManager : KryonetListener {
                 }
 
                 try {
-                    client.connect(5000, ipV4Address, TCP_PORT, UDP_PORT) // 6000, 6555 is for emulators only
+                    client.connect(5000, ipV4Address, 6000, 6555) // 6000, 6555 is for emulators only
                     emitter.onSuccess(Unit)
                 } catch (e: Throwable) {
                     emitter.onError(e)

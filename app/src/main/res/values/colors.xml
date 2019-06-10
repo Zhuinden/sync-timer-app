@@ -21,6 +21,10 @@
 
     <color name="white">#FFFFFF</color>
     <color name="whiteT50">#80FFFFFF</color>
+    <color name="whiteT60">#9AFFFFFF</color>
+    <color name="whiteT70">#B3FFFFFF</color>
+    <color name="whiteT75">#C0FFFFFF</color>
+    <color name="whiteT80">#CDFFFFFF</color>
     <color name="black">#000000</color>
     <color name="blackT50">#000000</color>
 </resources>
