@@ -39,6 +39,7 @@
                 android:layout_marginTop="@dimen/_8sdp"
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
+                android:gravity="center"
                 android:textSize="24sp"
                 android:textStyle="bold"
                 tools:text="Stopped!" />
@@ -65,7 +66,23 @@
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:minWidth="@dimen/_160sdp"
-                android:text="Start Timer" />
+                android:text="Start Timer"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/buttonStopTimer"
+                style="@style/ButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Stop Timer"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/buttonResetTimer"
@@ -77,7 +94,9 @@
                 android:layout_marginRight="@dimen/_32sdp"
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:minWidth="@dimen/_160sdp"
-                android:text="Reset Timer" />
+                android:text="Reset Timer"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/buttonPauseTimer"
@@ -90,7 +109,22 @@
                 android:layout_marginBottom="@dimen/_8sdp"
                 android:minWidth="@dimen/_160sdp"
                 android:text="Pause Timer"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/buttonUnpauseTimer"
+                style="@style/ButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_32sdp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:layout_marginRight="@dimen/_32sdp"
+                android:layout_marginBottom="@dimen/_8sdp"
+                android:minWidth="@dimen/_160sdp"
+                android:text="Unpause Timer"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/buttonExitSession"

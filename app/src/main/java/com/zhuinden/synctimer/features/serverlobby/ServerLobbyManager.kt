@@ -71,6 +71,18 @@ class ServerLobbyManager(
         mutableSessions.accept(members.map { it.value })
     }
 
+    fun sendCommandToAll(command: Any) {
+        connectionManager.handler.post {
+            connectionManager.activeServer.sendToAllTCP(command)
+        }
+    }
+
+    fun sendCommandToAllExcept(command: Any, excludedConnectionId: Int) {
+        connectionManager.handler.post {
+            connectionManager.activeServer.sendToAllExceptTCP(excludedConnectionId, command)
+        }
+    }
+
     @SuppressLint("CheckResult")
     fun startTimer(success: () -> Unit, failure: (Throwable) -> Unit) {
         val connectionIds = connections.values.map { registration -> registration.connectionId }

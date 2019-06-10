@@ -258,3 +258,24 @@ inline fun SharedPreferences.save(immediate: Boolean, actions: SharedPreferences
         }
     }
 }
+
+// tuple
+data class Tuple4<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D) {
+    /**
+     * Returns string representation of the [Tuple4] including its [first], [second], [third] and [fourth] values.
+     */
+    public override fun toString(): String = "($first, $second, $third, $fourth)"
+}
+
+data class Tuple5<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E) {
+    /**
+     * Returns string representation of the [Tuple5] including its [first], [second], [third], [fourth] and [fifth] values.
+     */
+    public override fun toString(): String = "($first, $second, $third, $fourth, $fifth)"
+}
+
+infix fun <A, B, C> Pair<A, B>.to(third: C) = Triple(first, second, third)
+
+infix fun <A, B, C, D> Triple<A, B, C>.to(fourth: D) = Tuple4(first, second, third, fourth)
+
+infix fun <A, B, C, D, E> Tuple4<A, B, C, D>.to(fifth: E) = Tuple5(first, second, third, fourth, fifth)

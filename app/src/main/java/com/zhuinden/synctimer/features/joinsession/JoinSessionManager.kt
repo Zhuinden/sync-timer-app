@@ -109,4 +109,10 @@ class JoinSessionManager(
 
     fun createBroadcastSearchSubscription(): Single<String> =
         connectionManager.searchHostViaBroadcast().map { inetAddress -> inetAddress.hostAddress }.observeOnMain()
+
+    fun sendCommandToHost(command: Any) {
+        connectionManager.handler.post {
+            connectionManager.activeClient.sendTCP(command)
+        }
+    }
 }

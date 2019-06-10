@@ -15,6 +15,14 @@ import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.synthetic.main.sync_timer_view.view.*
 
 class SyncTimerView : FrameLayout, BackHandler {
+    interface ActionHandler {
+        fun onStartTimerClicked()
+        fun onResetTimerClicked()
+        fun onStopTimerClicked()
+        fun onPauseTimerClicked()
+        fun onUnpauseTimerClicked()
+    }
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
@@ -27,6 +35,7 @@ class SyncTimerView : FrameLayout, BackHandler {
     )
 
     private val syncTimerManager by lazy { lookup<SyncTimerManager>() }
+    private val actionHandler by lazy { lookup<ActionHandler>() }
 
     private fun showLeavingAlert() {
         AlertDialog.Builder(context)
@@ -47,6 +56,26 @@ class SyncTimerView : FrameLayout, BackHandler {
         buttonExitSession.onClick {
             showLeavingAlert()
         }
+
+        buttonStartTimer.onClick {
+            actionHandler.onStartTimerClicked()
+        }
+
+        buttonStopTimer.onClick {
+            actionHandler.onStopTimerClicked()
+        }
+
+        buttonResetTimer.onClick {
+            actionHandler.onResetTimerClicked()
+        }
+
+        buttonPauseTimer.onClick {
+            actionHandler.onPauseTimerClicked()
+        }
+
+        buttonUnpauseTimer.onClick {
+            actionHandler.onUnpauseTimerClicked()
+        }
     }
 
     private val compositeDisposable = CompositeDisposable()
@@ -57,10 +86,37 @@ class SyncTimerView : FrameLayout, BackHandler {
 
         if (isInEditMode) return
 
-        compositeDisposable += syncTimerManager.currentTime
-            .subscribeBy { currentTime ->
-                textCountdownTime.text = "${currentTime}"
-            }
+        val key = getKey<SyncTimerKey>()
+
+        with(syncTimerManager) {
+            compositeDisposable += this.currentTime.combineWith(
+                stoppingPlayer,
+                isTimerStarted,
+                isTimerPaused,
+                isTimerReachedEnd
+            )
+                .subscribeBy { (currentTime, stoppingPlayer, isTimerStarted, isTimerPaused, isTimerReachedEnd) ->
+                    textCountdownTime.text = "${currentTime}"
+
+                    textStoppedIndicator.text = when {
+                        stoppingPlayer.isNotEmpty() -> "Stopped!"
+                        isTimerPaused -> "PAUSED!"
+                        isTimerReachedEnd -> "The timer has reached the end."
+                        isTimerStarted -> "The countdown is on!"
+                        else -> "Waiting for start."
+                    }
+                    textStopperNameText.text = when {
+                        stoppingPlayer.isNotEmpty() -> "$stoppingPlayer has stopped the timer!"
+                        else -> ""
+                    }
+
+                    buttonStopTimer.showIf { isTimerStarted && !isTimerPaused && !isTimerReachedEnd }
+                    buttonStartTimer.showIf { key.isHost() && !isTimerStarted && !isTimerReachedEnd && !isTimerPaused }
+                    buttonResetTimer.showIf { key.isHost() && !isTimerStarted && (stoppingPlayer.isNotEmpty() || isTimerReachedEnd) }
+                    buttonPauseTimer.showIf { key.isHost() && isTimerStarted && !isTimerPaused }
+                    buttonUnpauseTimer.showIf { key.isHost() && isTimerPaused }
+                }
+        }
 
         compositeNotificationToken += syncTimerManager.hostDisconnectedEvent  // TODO: DUPLICATION #1874 (kind of)
             .startListening { _ ->
