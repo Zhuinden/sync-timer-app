@@ -62,7 +62,7 @@ class SyncTimerView : FrameLayout, BackHandler {
                 textCountdownTime.text = "${currentTime}"
             }
 
-        compositeNotificationToken += syncTimerManager.hostDisconnectedEvent
+        compositeNotificationToken += syncTimerManager.hostDisconnectedEvent  // TODO: DUPLICATION #1874 (kind of)
             .startListening { _ ->
                 showLongToast(R.string.alert_host_disconnected)
                 backstack.jumpToRoot(StateChange.REPLACE) // TODO: this belongs in managers, but right now it'd be duplicate events

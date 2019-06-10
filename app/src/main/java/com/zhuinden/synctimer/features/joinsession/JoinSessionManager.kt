@@ -80,9 +80,20 @@ class JoinSessionManager(
                 }
             }
 
-        isConnected.bindToRegistration(this)
-            .subscribeBy { connected ->
-                if (!connected) {
+        isConnected
+            .distinctUntilChanged()
+            .buffer(2, 1) // [a,b], [b,c], ...
+            .map { connectedStates ->
+                val pair: Pair<Boolean?, Boolean> = if (connectedStates.size < 2) {
+                    Pair(null, connectedStates[0])
+                } else {
+                    Pair(connectedStates[0], connectedStates[1])
+                }
+                return@map pair
+            }
+            .bindToRegistration(this)
+            .subscribeBy { (previousConnected: Boolean?, currentConnected: Boolean) ->
+                if (previousConnected == true && !currentConnected) {
                     mutableHostDisconnectedEvent.emit(Unit)
                 }
             }

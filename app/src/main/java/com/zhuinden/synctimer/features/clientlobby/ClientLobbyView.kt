@@ -5,10 +5,14 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestack.StateChange
+import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
 import com.zhuinden.synctimer.features.joinsession.JoinSessionManager
+import com.zhuinden.synctimer.utils.CompositeNotificationToken
 import com.zhuinden.synctimer.utils.backstack
 import com.zhuinden.synctimer.utils.lookup
+import com.zhuinden.synctimer.utils.showLongToast
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -35,6 +39,8 @@ class ClientLobbyView : FrameLayout, BackHandler {
 
     private val compositeDisposable = CompositeDisposable()
 
+    private val compositeNotificationToken = CompositeNotificationToken()
+
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
@@ -46,6 +52,19 @@ class ClientLobbyView : FrameLayout, BackHandler {
                     textClientLobbyHost.text = hostUsername
                 }
             }
+
+        compositeNotificationToken += joinSessionManager.hostDisconnectedEvent.startListening {
+            // TODO: DUPLICATION #1874
+            showLongToast(R.string.alert_host_disconnected)
+            backstack.jumpToRoot(StateChange.REPLACE) // TODO: this belongs in managers, but right now it'd be duplicate events
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        compositeDisposable.clear()
+        compositeNotificationToken.stopListening()
     }
 
     override fun onBackPressed(): Boolean {
