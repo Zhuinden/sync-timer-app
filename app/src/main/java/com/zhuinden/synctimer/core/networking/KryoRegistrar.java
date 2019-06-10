@@ -2,9 +2,10 @@ package com.zhuinden.synctimer.core.networking;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand;
+import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand;
 
-public class KryoHelper {
-    private KryoHelper() {
+public class KryoRegistrar {
+    private KryoRegistrar() {
     }
 
     public static void configureKryo(Kryo kryo) {
@@ -13,5 +14,6 @@ public class KryoHelper {
         kryo.register(long[].class);
         kryo.register(String[].class);
         kryo.register(JoinSessionCommand.class);
+        kryo.register(StartSessionCommand.class);
     }
 }

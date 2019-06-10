@@ -89,7 +89,7 @@ class CreateSessionView : FrameLayout {
         if (isInEditMode) return
 
         compositeDisposable += connectionManager.isServerBeingStopped
-            .onUI()
+            .observeOnMain()
             .subscribeBy { isServerBeingStopped ->
                 buttonCreateSession.isEnabled = !isServerBeingStopped
             }

@@ -12,10 +12,19 @@ import android.text.TextWatcher
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.EditText
+import android.widget.Toast
 import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
 import com.zhuinden.simplestack.*
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.synctimer.core.navigation.ViewKey
+
+fun Context.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, text, duration).show()
+}
+
+fun View.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
+    context.showToast(text, duration)
+}
 
 tailrec fun <T : Activity> Context.findActivity(): T {
     if (this is Activity) {

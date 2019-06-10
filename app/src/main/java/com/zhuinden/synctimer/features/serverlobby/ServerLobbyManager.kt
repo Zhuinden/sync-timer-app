@@ -7,11 +7,13 @@ import com.esotericsoftware.kryonet.Connection
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.commands.JoinSessionCommand
+import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand
 import com.zhuinden.synctimer.core.settings.SettingsManager
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
-import com.zhuinden.synctimer.utils.onUI
+import com.zhuinden.synctimer.utils.observeOnMain
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
 import kotlinx.android.parcel.Parcelize
 import java.net.InetAddress
@@ -78,6 +80,28 @@ class ServerLobbyManager(
     }
 
     @SuppressLint("CheckResult")
+    fun startTimer(success: () -> Unit, failure: (Throwable) -> Unit) {
+        val connectionIds = connections.values.map { registration -> registration.connectionId }
+
+        Single.create<Unit> { emitter ->
+            connectionIds.forEach { connectionId ->
+                connectionManager.activeServer.sendToTCP(
+                    connectionId,
+                    StartSessionCommand(timerConfiguration)
+                )
+            }
+            emitter.onSuccess(Unit)
+        }.bindToRegistration(this)
+            .subscribeOn(connectionManager.scheduler)
+            .observeOnMain()
+            .subscribeBy(onSuccess = {
+                success() // TODO: navigation belongs outside of the View
+            }, onError = { throwable ->
+                failure(throwable)
+            })
+    }
+
+    @SuppressLint("CheckResult")
     override fun onServiceRegistered() {
         super.onServiceRegistered()
 
@@ -114,7 +138,7 @@ class ServerLobbyManager(
 
     private inline fun <T : Any> Observable<T>.observe(crossinline eventListener: (T) -> Unit) =
         this.bindToRegistration(this@ServerLobbyManager)
-            .onUI()
+            .observeOnMain()
             .subscribeBy(onNext = { event ->
                 eventListener.invoke(event)
             })

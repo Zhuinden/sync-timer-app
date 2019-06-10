@@ -38,8 +38,14 @@ class ServerLobbyView : FrameLayout, BackHandler {
 
         recyclerSessionMembers.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
-        buttonBlahGoToTimer.onClick {
-            backstack.goTo(SyncTimerKey())
+        buttonStartTimer.onClick {
+            serverLobbyManager.startTimer(failure = { err ->
+                // TODO: this all belongs outside of the view
+                showToast("Could not start all timers. Aborting...")
+                backstack.jumpToRoot()
+            }, success = {
+                backstack.goTo(SyncTimerKey(SyncTimerKey.SessionType.SERVER))
+            })
         }
 
         textHostIpAddress.text = serverLobbyManager.getNextIp()

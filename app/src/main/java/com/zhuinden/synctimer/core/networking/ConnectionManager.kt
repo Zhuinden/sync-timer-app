@@ -87,7 +87,7 @@ class ConnectionManager {
             if (currentServer == null) {
                 val server = Server()
                 this.server.set(server)
-                KryoHelper.configureKryo(server.kryo)
+                KryoRegistrar.configureKryo(server.kryo)
                 Log.i(TAG, "Starting server")
                 server.start()
                 Log.i(TAG, "Server started")
@@ -107,7 +107,7 @@ class ConnectionManager {
             if (currentClient == null) {
                 val client = Client()
                 this.client.set(client)
-                KryoHelper.configureKryo(client.kryo)
+                KryoRegistrar.configureKryo(client.kryo)
                 Log.i(TAG, "Starting client")
                 client.start()
                 Log.i(TAG, "Client started")

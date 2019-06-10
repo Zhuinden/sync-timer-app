@@ -6,12 +6,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.util.Patterns
 import android.widget.FrameLayout
-import android.widget.Toast
 import com.zhuinden.synctimer.features.clientlobby.ClientLobbyKey
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.lookup
-import com.zhuinden.synctimer.utils.onClick
-import com.zhuinden.synctimer.utils.onTextChanged
+import com.zhuinden.synctimer.utils.*
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
@@ -53,7 +49,7 @@ class JoinSessionView : FrameLayout {
             // TODO: Rx belongs in the manager
             compositeDisposable += joinSessionManager.createBroadcastSearchSubscription().subscribeBy(
                 onError = { throwable ->
-                    Toast.makeText(context, "Failed to search via broadcast", Toast.LENGTH_SHORT).show() // todo
+                    showToast("Failed to search via broadcast") // todo
                     Log.e("JoinSession", "Failed to find host", throwable)
                 },
                 onSuccess = { host: String ->
@@ -68,7 +64,7 @@ class JoinSessionView : FrameLayout {
             // TODO: Rx belongs in the manager
             compositeDisposable += joinSessionManager.createClientSubscription(ipV4Address).subscribeBy(
                 onError = { throwable ->
-                    Toast.makeText(context, "Failed to connect to $ipV4Address", Toast.LENGTH_SHORT).show() // todo
+                    showToast("Failed to connect to $ipV4Address") // todo
                     Log.e("JoinSession", "Failed to connect", throwable)
                 },
                 onSuccess = {
