@@ -7,6 +7,7 @@ import com.zhuinden.simplestack.History
 import com.zhuinden.simplestack.navigator.Navigator
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
+import com.zhuinden.synctimer.core.navigation.SyncTimerKeyFilter
 import com.zhuinden.synctimer.core.scoping.ScopeConfiguration
 import com.zhuinden.synctimer.features.splash.SplashKey
 import com.zhuinden.synctimer.utils.add
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
                     .add(app.connectionManager)
                     .build()
             )
+            .setKeyFilter(SyncTimerKeyFilter())
             .setScopedServices(ScopeConfiguration())
             .install(this, root, History.of(SplashKey()))
     }

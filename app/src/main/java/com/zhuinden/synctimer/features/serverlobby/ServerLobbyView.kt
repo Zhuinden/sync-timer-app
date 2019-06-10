@@ -72,6 +72,8 @@ class ServerLobbyView : FrameLayout, BackHandler {
                 }
             }
             recyclerSessionMembers.adapter = adapter
+
+            buttonStartTimer.isEnabled = members.isNotEmpty()
         }
     }
 
