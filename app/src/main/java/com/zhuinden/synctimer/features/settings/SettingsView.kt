@@ -35,6 +35,7 @@ class SettingsView : FrameLayout {
         super.onFinishInflate()
 
         inputUsername.onTextChanged { text ->
+            username = text
             buttonSaveChanges.isEnabled = text.isNotEmpty()
         }
 
