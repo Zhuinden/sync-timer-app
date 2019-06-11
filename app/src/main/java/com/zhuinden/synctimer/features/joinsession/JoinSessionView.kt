@@ -26,6 +26,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.util.Patterns
 import android.widget.FrameLayout
+import com.zhuinden.synctimer.core.settings.SettingsManager
 import com.zhuinden.synctimer.features.clientlobby.ClientLobbyKey
 import com.zhuinden.synctimer.utils.*
 import io.reactivex.disposables.CompositeDisposable
@@ -46,6 +47,7 @@ class JoinSessionView : FrameLayout {
     )
 
     private val joinSessionManager by lazy { lookup<JoinSessionManager>() }
+    private val settingsManager by lazy { lookup<SettingsManager>() }
 
     private var ipV4Address: String = ""
 
@@ -56,12 +58,22 @@ class JoinSessionView : FrameLayout {
     override fun onFinishInflate() {
         super.onFinishInflate()
 
+        if (isInEditMode) return
+
         inputIpAddress.onTextChanged { ip ->
             this.ipV4Address = ip
 
             val matcher = Patterns.IP_ADDRESS.matcher(ipV4Address)
-            buttonJoinSession.isEnabled = matcher.matches()
+
+            val matches = matcher.matches()
+            buttonJoinSession.isEnabled = matches
+
+            if (matches) {
+                settingsManager.savePreviousHostAddress(ip)
+            }
         }
+
+        inputIpAddress.setText(settingsManager.getPreviousHostAddress())
 
         buttonBroadcastSearch.onClick {
             if (!isAttached) return@onClick

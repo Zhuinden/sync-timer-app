@@ -43,6 +43,8 @@ class SettingsManager(
         const val END_VALUE = "END_VALUE"
         const val DECREASE_STEP = "DECREASE_STEP"
         const val DECREASE_INTERVAL = "DECREASE_INTERVAL"
+
+        const val PREVIOUS_HOST_ADDRESS = "PREVIOUS_HOST_ADDRESS"
     }
 
     fun getUsername(): String? = sharedPreferences.getString(USERNAME, "").ifEmpty { null }
@@ -76,5 +78,11 @@ class SettingsManager(
 
     fun saveDecreaseInterval(decreaseInterval: Int) {
         decreaseInterval.saveAs(DECREASE_INTERVAL)
+    }
+
+    fun getPreviousHostAddress(): String = sharedPreferences.getString(PREVIOUS_HOST_ADDRESS, "")!!
+
+    fun savePreviousHostAddress(previousHostAddress: String) {
+        previousHostAddress.saveAs(PREVIOUS_HOST_ADDRESS)
     }
 }
