@@ -56,7 +56,7 @@ class SetupView : FrameLayout {
         buttonSetupContinue.onClick {
             settingsManager.saveUsername(username)
 
-            backstack.goTo(MainMenuKey())
+            backstack.replaceHistory(MainMenuKey())
         }
     }
 }
