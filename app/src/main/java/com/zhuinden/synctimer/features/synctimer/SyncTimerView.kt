@@ -143,6 +143,18 @@ class SyncTimerView : FrameLayout, BackHandler {
                 showLongToast(R.string.alert_host_disconnected)
                 backstack.jumpToRoot(StateChange.REPLACE) // TODO: this belongs in managers, but right now it'd be duplicate events
             }
+
+        compositeNotificationToken += syncTimerManager.confirmationEvents
+            .startListening { confirmationEvent ->
+                AlertDialog.Builder(context)
+                    .setTitle("Restarting stopped timer")
+                    .setMessage("Someone has stopped the timer, do you want to start it again?")
+                    .setPositiveButton("Start timer") { _, _ ->
+                        confirmationEvent.onPositiveClick()
+                    }
+                    .setNegativeButton("Cancel") { _, _ -> }
+                    .show()
+            }
     }
 
     override fun onDetachedFromWindow() {

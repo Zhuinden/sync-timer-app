@@ -67,6 +67,11 @@ class SyncTimerManager(
     private val mutableIsTimerReachedEnd: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
     val isTimerReachedEnd: Observable<Boolean> = mutableIsTimerReachedEnd
 
+    class ConfirmationEvent(val onPositiveClick: () -> Unit)
+
+    private val mutableConfirmationEvents = EventEmitter<ConfirmationEvent>()
+    val confirmationEvents: EventSource<ConfirmationEvent> = mutableConfirmationEvents
+
     private var serverIsCountdownActive = false
         set(value) {
             field = value
@@ -169,12 +174,24 @@ class SyncTimerManager(
         if (isServer) { // TODO: this is a smell, clearly there are two things in one here.
             val serverLobbyManager = serverLobbyManager!!
 
-            serverIsCountdownActive = true
-            mutableStoppingPlayer.accept("")
-            mutableIsTimerPaused.accept(false)
+            val stoppingPlayer = mutableStoppingPlayer.value!!
 
-            serverSendSyncCommand()
+            if (stoppingPlayer.isEmpty()) {
+                serverStartTimer()
+            } else {
+                mutableConfirmationEvents.emit(ConfirmationEvent {
+                    serverStartTimer()
+                })
+            }
         }
+    }
+
+    private fun serverStartTimer() {
+        serverIsCountdownActive = true
+        mutableStoppingPlayer.accept("")
+        mutableIsTimerPaused.accept(false)
+
+        serverSendSyncCommand()
     }
 
     override fun onResetTimerClicked() {
