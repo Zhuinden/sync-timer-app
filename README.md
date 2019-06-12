@@ -26,7 +26,7 @@ conditions are met:
 - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
 disclaimer in the documentation and/or other materials provided with the distribution.
 - The binary form of the software cannot be redistributed for commercial use under the name of a separate entity,
-when the binary form is built from using all included source files, or any of the full and complete compilation modules of the software are used as a submodule of another software.
+when the binary form is built from using all included source files, or any of the compilation modules (excluding external dependencies by separate entities other than the author) of the software are used as a submodule of another software.
 - Prior written permission must be given in order to use the name of its author or other project contributors
 for endorsing or promoting products derived from this software.
 
