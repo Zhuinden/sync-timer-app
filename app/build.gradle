@@ -33,8 +33,7 @@ dependencies {
     implementation 'com.github.Zhuinden:simple-stack:2.0.3'
     implementation 'com.bartoszlipinski:viewpropertyobjectanimator:1.4.5'
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
-    implementation 'com.esotericsoftware.kryo:kryo:2.24.0' //kryonet maven does not include sources
-    implementation 'com.esotericsoftware:jsonbeans:0.7' //kryonet maven does not include sources
+    implementation project(':kryonet') //kryonet maven does not include sources
     implementation 'com.github.Zhuinden:event-emitter:0.0.1'
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.1.0'
     implementation 'com.trello.rxlifecycle3:rxlifecycle:3.0.0'

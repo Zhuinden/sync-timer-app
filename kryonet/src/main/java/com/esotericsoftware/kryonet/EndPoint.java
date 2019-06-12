@@ -1,15 +1,15 @@
 /* Copyright (c) 2008, Nathan Sweet
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
  * conditions are met:
- * 
+ *
  * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
  * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
  * disclaimer in the documentation and/or other materials provided with the distribution.
  * - Neither the name of Esoteric Software nor the names of its contributors may be used to endorse or promote products derived
  * from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
  * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
  * SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
@@ -19,35 +19,66 @@
 
 package com.esotericsoftware.kryonet;
 
-import com.esotericsoftware.minlog.Log;
+import com.esotericsoftware.kryo.Kryo;
 
-/** Marker interface to denote that a message is used by the Ninja framework and is generally invisible to the developer. Eg, these
- * messages are only logged at the {@link Log#LEVEL_TRACE} level.
- * @author Nathan Sweet <misc@n4te.com> */
-public interface FrameworkMessage {
-	static final FrameworkMessage.KeepAlive keepAlive = new KeepAlive();
+import java.io.IOException;
 
-	/** Internal message to give the client the server assigned connection ID. */
-	static public class RegisterTCP implements FrameworkMessage {
-		public int connectionID;
-	}
+/**
+ * Represents the local end point of a connection.
+ *
+ * @author Nathan Sweet <misc@n4te.com>
+ */
+public interface EndPoint extends Runnable {
+    /**
+     * Gets the serialization instance that will be used to serialize and deserialize objects.
+     */
+    public Serialization getSerialization();
 
-	/** Internal message to give the server the client's UDP port. */
-	static public class RegisterUDP implements FrameworkMessage {
-		public int connectionID;
-	}
+    /**
+     * If the listener already exists, it is not added again.
+     */
+    public void addListener(Listener listener);
 
-	/** Internal message to keep connections alive. */
-	static public class KeepAlive implements FrameworkMessage {
-	}
+    public void removeListener(Listener listener);
 
-	/** Internal message to discover running servers. */
-	static public class DiscoverHost implements FrameworkMessage {
-	}
+    /**
+     * Continually updates this end point until {@link #stop()} is called.
+     */
+    public void run();
 
-	/** Internal message to determine round trip time. */
-	static public class Ping implements FrameworkMessage {
-		public int id;
-		public boolean isReply;
-	}
+    /**
+     * Starts a new thread that calls {@link #run()}.
+     */
+    public void start();
+
+    /**
+     * Closes this end point and causes {@link #run()} to return.
+     */
+    public void stop();
+
+    /**
+     * @see Client
+     * @see Server
+     */
+    public void close();
+
+    /**
+     * @see Client#update(int)
+     * @see Server#update(int)
+     */
+    public void update(int timeout) throws IOException;
+
+    /**
+     * Returns the last thread that called {@link #update(int)} for this end point. This can be useful to detect when long running
+     * code will be run on the update thread.
+     */
+    public Thread getUpdateThread();
+
+    /**
+     * Gets the Kryo instance that will be used to serialize and deserialize objects. Returns null if {@link KryoSerialization} is
+     * not being used.
+     *
+     * @return May be null.
+     */
+    public Kryo getKryo();
 }
