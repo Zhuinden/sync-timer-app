@@ -104,7 +104,7 @@ class ServerLobbyManager(
     }
 
     @SuppressLint("CheckResult")
-    fun startTimer(success: () -> Unit, failure: (Throwable) -> Unit) {
+    fun startTimerForAllPlayers(success: () -> Unit, failure: (Throwable) -> Unit) {
         val connectionIds = connections.values.map { registration -> registration.connectionId }
 
         Single.create<Unit> { emitter ->

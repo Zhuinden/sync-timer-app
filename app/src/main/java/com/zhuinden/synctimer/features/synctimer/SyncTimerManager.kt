@@ -28,6 +28,7 @@ import com.zhuinden.eventemitter.EventEmitter
 import com.zhuinden.eventemitter.EventSource
 import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.SessionType
+import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand
 import com.zhuinden.synctimer.core.networking.commands.StopTimerByUserCommand
 import com.zhuinden.synctimer.core.networking.commands.TimerSyncCommand
 import com.zhuinden.synctimer.core.settings.SettingsManager
@@ -131,6 +132,17 @@ class SyncTimerManager(
         }
 
         if (isServer) {
+            connectionManager.connectedEvents
+                .bindToRegistration(this)
+                .subscribeBy { (connection) ->
+                    // this is on looper thread
+                    connectionManager.activeServer.sendToTCP(connection.id, StartSessionCommand(timerConfiguration))
+
+                    handler.post {
+                        serverSendSyncCommand()
+                    }
+                }
+
             connectionManager.commandReceivedEvents
                 .bindToRegistration(this)
                 .observeOnMain()

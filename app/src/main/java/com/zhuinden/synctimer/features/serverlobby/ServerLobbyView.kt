@@ -61,7 +61,7 @@ class ServerLobbyView : FrameLayout, BackHandler {
 
         buttonStartTimer.onClick {
             // TODO: this all belongs outside of the view
-            serverLobbyManager.startTimer(failure = { err ->
+            serverLobbyManager.startTimerForAllPlayers(failure = { err ->
                 showToast("Could not start all timers. Aborting...")
                 backstack.jumpToRoot()
             }, success = {
