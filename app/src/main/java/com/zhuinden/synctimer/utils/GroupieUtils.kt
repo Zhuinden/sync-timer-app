@@ -19,12 +19,11 @@ import kotlinx.android.extensions.LayoutContainer
 
 typealias GroupieAdapter = GroupAdapter<GroupieViewHolder>
 
-class GroupieViewHolder(override val containerView: View) : ViewHolder(containerView), LayoutContainer
+open class GroupieViewHolder(override val containerView: View) : ViewHolder(containerView), LayoutContainer
 
 abstract class GroupieItem : Item<GroupieViewHolder>() {
-    final override fun createViewHolder(itemView: View): GroupieViewHolder {
-        return GroupieViewHolder(itemView)
-    }
+    override fun createViewHolder(itemView: View): GroupieViewHolder =
+        GroupieViewHolder(itemView)
 }
 
 fun GroupAdapter<GroupieViewHolder>.replaceItemsWith(builder: MutableList<GroupieItem>.() -> Unit) {

@@ -20,14 +20,24 @@
  */
 package com.zhuinden.synctimer.features.serverlobby
 
+import android.view.View
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.utils.GroupieItem
 import com.zhuinden.synctimer.utils.GroupieViewHolder
+import com.zhuinden.synctimer.utils.onClick
 import kotlinx.android.synthetic.main.server_lobby_session_member_item.view.*
 
 class ServerLobbySessionMemberItem(
     private val sessionMember: ServerLobbyManager.SessionMember
 ) : GroupieItem() {
+    class ViewHolder(view: View) : GroupieViewHolder(view) {
+        init {
+            view.onClick { /* click */ }
+        }
+    }
+
+    override fun createViewHolder(itemView: View): GroupieViewHolder = ViewHolder(itemView)
+
     override fun getId(): Long = sessionMember.connectionId.toLong()
     override fun equals(other: Any?): Boolean =
         other is ServerLobbySessionMemberItem && other.sessionMember == sessionMember
