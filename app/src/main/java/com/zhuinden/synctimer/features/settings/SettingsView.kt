@@ -1,22 +1,5 @@
 /* Copyright (c) 2019, Gabor Varadi
  * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
- * conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
- * - Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
- * disclaimer in the documentation and/or other materials provided with the distribution.
- * - The binary form of the software cannot be redistributed for commercial use under the name of a separate entity
- * when the binary form is built from using all included source files, or any of the compilation modules (excluding external dependencies by separate entities other than the author) of the software are used as a submodule of another software.
- * - Prior written permission must be given in order to use the name of its author or other project contributors
- * for endorsing or promoting products derived from this software.
- *
- * THIS SOFTWARE IS PROVIDED BY THE CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package com.zhuinden.synctimer.features.settings
 
@@ -25,7 +8,10 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zhuinden.synctimer.core.settings.SettingsManager
-import com.zhuinden.synctimer.utils.*
+import com.zhuinden.synctimer.utils.backstack
+import com.zhuinden.synctimer.utils.lookup
+import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.onTextChanged
 import kotlinx.android.synthetic.main.settings_view.view.*
 
 class SettingsView : FrameLayout {
