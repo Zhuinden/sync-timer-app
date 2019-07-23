@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.zhuinden.synctimer.features.createsession.CreateSessionView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.zhuinden.synctimer.screens.createsession.CreateSessionView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -134,4 +134,4 @@
                 android:text="Create Session" />
         </LinearLayout>
     </ScrollView>
-</com.zhuinden.synctimer.features.createsession.CreateSessionView>
+</com.zhuinden.synctimer.screens.createsession.CreateSessionView>

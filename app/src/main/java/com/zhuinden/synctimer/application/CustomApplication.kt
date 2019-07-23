@@ -7,7 +7,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.zhuinden.synctimer.core.networking.ConnectionManager
-import com.zhuinden.synctimer.core.settings.SettingsManager
+import com.zhuinden.synctimer.features.settings.SettingsManager
 
 class CustomApplication : Application() {
     private lateinit var sharedPreferences: SharedPreferences

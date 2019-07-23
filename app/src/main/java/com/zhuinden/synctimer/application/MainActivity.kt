@@ -12,7 +12,7 @@ import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
 import com.zhuinden.synctimer.core.navigation.SyncTimerKeyFilter
 import com.zhuinden.synctimer.core.scoping.ScopeConfiguration
-import com.zhuinden.synctimer.features.splash.SplashKey
+import com.zhuinden.synctimer.screens.splash.SplashKey
 import com.zhuinden.synctimer.utils.add
 import kotlinx.android.synthetic.main.activity_main.*
 
