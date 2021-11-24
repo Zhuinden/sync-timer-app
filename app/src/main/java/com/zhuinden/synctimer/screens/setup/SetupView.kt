@@ -7,15 +7,25 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestack.History
+import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import com.zhuinden.synctimer.databinding.SetupViewBinding
 import com.zhuinden.synctimer.features.settings.SettingsManager
 import com.zhuinden.synctimer.screens.mainmenu.MainMenuKey
-import com.zhuinden.synctimer.utils.*
-import kotlinx.android.synthetic.main.setup_view.view.*
+import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.onTextChanged
 
 class SetupView : FrameLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -24,22 +34,26 @@ class SetupView : FrameLayout {
         defStyleRes
     )
 
+    private lateinit var binding: SetupViewBinding
+
     private var username: String = ""
 
-    private val settingsManager by lazy { lookup<SettingsManager>() }
+    private val settingsManager by lazy { backstack.lookup<SettingsManager>() }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        inputUsername.onTextChanged { text ->
-            buttonSetupContinue.isEnabled = text.isNotEmpty()
+        binding = SetupViewBinding.bind(this)
+
+        binding.inputUsername.onTextChanged { text ->
+            binding.buttonSetupContinue.isEnabled = text.isNotEmpty()
             username = text
         }
 
-        buttonSetupContinue.onClick {
+        binding.buttonSetupContinue.onClick {
             settingsManager.saveUsername(username)
 
-            backstack.replaceHistory(MainMenuKey())
+            backstack.setHistory(History.of(MainMenuKey()), StateChange.REPLACE)
         }
     }
 }

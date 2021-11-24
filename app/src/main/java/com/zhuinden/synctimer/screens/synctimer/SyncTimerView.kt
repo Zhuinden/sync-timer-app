@@ -8,15 +8,21 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestack.Backstack
 import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
+import com.zhuinden.synctimer.databinding.SyncTimerViewBinding
 import com.zhuinden.synctimer.features.timer.SyncTimerManager
-import com.zhuinden.synctimer.utils.*
+import com.zhuinden.synctimer.utils.CompositeNotificationToken
+import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.showIf
+import com.zhuinden.synctimer.utils.showLongToast
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.sync_timer_view.view.*
 
 class SyncTimerView : FrameLayout, BackHandler {
     interface ActionHandler {
@@ -27,9 +33,16 @@ class SyncTimerView : FrameLayout, BackHandler {
         fun onUnpauseTimerClicked()
     }
 
+    private lateinit var binding: SyncTimerViewBinding
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -38,8 +51,8 @@ class SyncTimerView : FrameLayout, BackHandler {
         defStyleRes
     )
 
-    private val syncTimerManager by lazy { lookup<SyncTimerManager>() }
-    private val actionHandler by lazy { lookup<ActionHandler>() }
+    private val syncTimerManager by lazy { backstack.lookup<SyncTimerManager>() }
+    private val actionHandler by lazy { backstack.lookup<ActionHandler>() }
 
     private fun showLeavingAlert() {
         AlertDialog.Builder(context)
@@ -57,27 +70,29 @@ class SyncTimerView : FrameLayout, BackHandler {
 
         if (isInEditMode) return
 
-        buttonExitSession.onClick {
+        binding = SyncTimerViewBinding.bind(this)
+
+        binding.buttonExitSession.onClick {
             showLeavingAlert()
         }
 
-        buttonStartTimer.onClick {
+        binding.buttonStartTimer.onClick {
             actionHandler.onStartTimerClicked()
         }
 
-        buttonStopTimer.onClick {
+        binding.buttonStopTimer.onClick {
             actionHandler.onStopTimerClicked()
         }
 
-        buttonResetTimer.onClick {
+        binding.buttonResetTimer.onClick {
             actionHandler.onResetTimerClicked()
         }
 
-        buttonPauseTimer.onClick {
+        binding.buttonPauseTimer.onClick {
             actionHandler.onPauseTimerClicked()
         }
 
-        buttonUnpauseTimer.onClick {
+        binding.buttonUnpauseTimer.onClick {
             actionHandler.onUnpauseTimerClicked()
         }
     }
@@ -90,29 +105,29 @@ class SyncTimerView : FrameLayout, BackHandler {
 
         if (isInEditMode) return
 
-        val key = getKey<SyncTimerKey>()
+        val key = Backstack.getKey<SyncTimerKey>(context)
 
         compositeDisposable += syncTimerManager.timerState.subscribeBy { state ->
             with(state) {
-                textCountdownTime.text = "${currentTime}"
+                binding.textCountdownTime.text = "${currentTime}"
 
-                textStoppedIndicator.text = when {
+                binding.textStoppedIndicator.text = when {
                     isTimerStoppedByPlayer -> "Stopped!"
                     isTimerPaused -> "PAUSED!"
                     isTimerReachedEnd -> "The timer has reached the end."
                     isTimerStarted -> "The countdown is on!"
                     else -> "Waiting for start."
                 }
-                textStopperNameText.text = when {
+                binding.textStopperNameText.text = when {
                     isTimerStoppedByPlayer -> "$stoppingPlayer has stopped the timer!"
                     else -> ""
                 }
 
-                buttonStopTimer.showIf { isTimerStarted && !isTimerPaused && !isTimerReachedEnd }
-                buttonStartTimer.showIf { key.isHost() && !isTimerStarted && !isTimerReachedEnd && !isTimerPaused }
-                buttonResetTimer.showIf { key.isHost() && !isTimerStarted && (isTimerStoppedByPlayer || isTimerReachedEnd) }
-                buttonPauseTimer.showIf { key.isHost() && isTimerStarted && !isTimerPaused }
-                buttonUnpauseTimer.showIf { key.isHost() && isTimerPaused }
+                binding.buttonStopTimer.showIf { isTimerStarted && !isTimerPaused && !isTimerReachedEnd }
+                binding.buttonStartTimer.showIf { key.isHost() && !isTimerStarted && !isTimerReachedEnd && !isTimerPaused }
+                binding.buttonResetTimer.showIf { key.isHost() && !isTimerStarted && (isTimerStoppedByPlayer || isTimerReachedEnd) }
+                binding.buttonPauseTimer.showIf { key.isHost() && isTimerStarted && !isTimerPaused }
+                binding.buttonUnpauseTimer.showIf { key.isHost() && isTimerPaused }
             }
         }
 

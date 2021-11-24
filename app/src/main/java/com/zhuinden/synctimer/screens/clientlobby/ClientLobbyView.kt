@@ -9,22 +9,27 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.BackHandler
+import com.zhuinden.synctimer.databinding.ClientLobbyViewBinding
 import com.zhuinden.synctimer.features.client.JoinSessionManager
 import com.zhuinden.synctimer.utils.CompositeNotificationToken
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.lookup
 import com.zhuinden.synctimer.utils.showLongToast
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.client_lobby_view.view.*
 
 class ClientLobbyView : FrameLayout, BackHandler {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -33,10 +38,14 @@ class ClientLobbyView : FrameLayout, BackHandler {
         defStyleRes
     )
 
-    private val joinSessionManager by lazy { lookup<JoinSessionManager>() }
+    private val joinSessionManager by lazy { backstack.lookup<JoinSessionManager>() }
+
+    private lateinit var binding: ClientLobbyViewBinding
 
     override fun onFinishInflate() {
         super.onFinishInflate()
+
+        binding = ClientLobbyViewBinding.bind(this)
     }
 
     private val compositeDisposable = CompositeDisposable()
@@ -51,7 +60,7 @@ class ClientLobbyView : FrameLayout, BackHandler {
         compositeDisposable += joinSessionManager.hostUsername
             .subscribeBy { hostUsername ->
                 if (hostUsername.isNotEmpty()) {
-                    textClientLobbyHost.text = hostUsername
+                    binding.textClientLobbyHost.text = hostUsername
                 }
             }
 

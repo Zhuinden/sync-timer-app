@@ -18,6 +18,7 @@ import com.zhuinden.synctimer.screens.synctimer.SyncTimerKey
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
 import com.zhuinden.synctimer.utils.observeOnMain
+import com.zhuinden.synctimer.utils.tryOrNull
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -53,7 +54,9 @@ class JoinSessionManager(
             .subscribeBy { (connection) ->
                 hostConnectionId = connection.id
                 connectionManager.handler.post {
-                    connectionManager.activeClient.sendTCP(JoinSessionCommand(username))
+                    tryOrNull {
+                        connectionManager.activeClient.sendTCP(JoinSessionCommand(username))
+                    }
                 }
                 mutableIsConnected.accept(true)
             }

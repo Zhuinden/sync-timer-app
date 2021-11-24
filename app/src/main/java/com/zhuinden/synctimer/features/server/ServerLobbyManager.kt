@@ -15,6 +15,7 @@ import com.zhuinden.synctimer.features.settings.SettingsManager
 import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
 import com.zhuinden.synctimer.utils.observeOnMain
+import com.zhuinden.synctimer.utils.tryOrNull
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.rxkotlin.subscribeBy
@@ -83,13 +84,17 @@ class ServerLobbyManager(
 
     fun sendCommandToAll(command: Any) {
         connectionManager.handler.post {
-            connectionManager.activeServer.sendToAllTCP(command)
+            tryOrNull {
+                connectionManager.activeServer.sendToAllTCP(command)
+            }
         }
     }
 
     fun sendCommandToAllExcept(command: Any, excludedConnectionId: Int) {
         connectionManager.handler.post {
-            connectionManager.activeServer.sendToAllExceptTCP(excludedConnectionId, command)
+            tryOrNull {
+                connectionManager.activeServer.sendToAllExceptTCP(excludedConnectionId, command)
+            }
         }
     }
 
@@ -129,7 +134,12 @@ class ServerLobbyManager(
 
                         val connectionId = connection.id
                         connectionManager.handler.post {
-                            connectionManager.activeServer.sendToTCP(connectionId, JoinSessionCommand(hostUsername))
+                            tryOrNull {
+                                connectionManager.activeServer.sendToTCP(
+                                    connectionId,
+                                    JoinSessionCommand(hostUsername)
+                                )
+                            }
                         }
                     }
                 }

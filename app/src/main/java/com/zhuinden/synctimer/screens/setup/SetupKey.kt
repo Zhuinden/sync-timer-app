@@ -5,7 +5,7 @@ package com.zhuinden.synctimer.screens.setup
 
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.ViewKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SetupKey(private val placeholder: String = ""): ViewKey {

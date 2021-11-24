@@ -7,7 +7,7 @@ import com.zhuinden.simplestack.navigator.ViewChangeHandler
 import com.zhuinden.simplestack.navigator.changehandlers.FadeViewChangeHandler
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.ViewKey
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MainMenuKey(private val placeholder: String = ""): ViewKey {

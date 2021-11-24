@@ -30,7 +30,8 @@ class SettingsManager(
         const val PREVIOUS_HOST_ADDRESS = "PREVIOUS_HOST_ADDRESS"
     }
 
-    fun getUsername(): String? = sharedPreferences.getString(USERNAME, "").ifEmpty { null }
+    fun getUsername(): String? =
+        sharedPreferences.getString(USERNAME, "")?.takeIf { it.isNotEmpty() }
 
     fun saveUsername(username: String) {
         if (username.isEmpty()) {

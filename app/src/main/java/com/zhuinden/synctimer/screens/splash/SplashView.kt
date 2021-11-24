@@ -9,12 +9,13 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestack.History
+import com.zhuinden.simplestack.StateChange
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.features.settings.SettingsManager
 import com.zhuinden.synctimer.screens.mainmenu.MainMenuKey
 import com.zhuinden.synctimer.screens.setup.SetupKey
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.lookup
-import com.zhuinden.synctimer.utils.replaceHistory
 import com.zhuinden.synctimer.utils.waitForMeasure
 
 class SplashView : FrameLayout {
@@ -31,7 +32,7 @@ class SplashView : FrameLayout {
 
     private val delayProvider = Handler(Looper.getMainLooper())
 
-    private val settingsManager by lazy { lookup<SettingsManager>() }
+    private val settingsManager by lazy { backstack.lookup<SettingsManager>() }
 
     private val runnable = Runnable {
         val username = settingsManager.getUsername()
@@ -39,7 +40,7 @@ class SplashView : FrameLayout {
             username == null -> SetupKey()
             else -> MainMenuKey()
         }
-        backstack.replaceHistory(target)
+        backstack.setHistory(History.of(target), StateChange.REPLACE)
     }
 
     private var isDetached = false

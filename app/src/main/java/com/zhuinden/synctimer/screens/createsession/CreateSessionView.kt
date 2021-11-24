@@ -7,19 +7,28 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.core.networking.ConnectionManager
+import com.zhuinden.synctimer.databinding.CreateSessionViewBinding
 import com.zhuinden.synctimer.features.settings.SettingsManager
 import com.zhuinden.synctimer.screens.serverlobby.ServerLobbyKey
-import com.zhuinden.synctimer.utils.*
+import com.zhuinden.synctimer.utils.observeOnMain
+import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.onTextChanged
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.create_session_view.view.*
 
 class CreateSessionView : FrameLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -28,57 +37,61 @@ class CreateSessionView : FrameLayout {
         defStyleRes
     )
 
-    private val settingsManager by lazy { lookup<SettingsManager>() }
-    private val connectionManager by lazy { lookup<ConnectionManager>() }
+    private val settingsManager by lazy { backstack.lookup<SettingsManager>() }
+    private val connectionManager by lazy { backstack.lookup<ConnectionManager>() }
 
     private var startValue: Int = 0
     private var endValue: Int = 0
     private var decreaseStep: Int = 0
     private var decreaseInterval: Int = 0
 
+    private lateinit var binding: CreateSessionViewBinding
+
     override fun onFinishInflate() {
         super.onFinishInflate()
 
         if (isInEditMode) return
+
+        binding = CreateSessionViewBinding.bind(this)
 
         startValue = settingsManager.getStartValue()
         endValue = settingsManager.getEndValue()
         decreaseStep = settingsManager.getDecreaseStep()
         decreaseInterval = settingsManager.getDecreaseInterval()
 
-        inputStartValue.setText("$startValue")
-        inputStartValue.onTextChanged { startValue ->
+        binding.inputStartValue.setText("$startValue")
+        binding.inputStartValue.onTextChanged { startValue ->
             if (startValue.isNotEmpty()) {
                 this.startValue = startValue.toInt()
                 settingsManager.saveStartValue(startValue.toInt())
             }
         }
 
-        inputEndValue.setText("$endValue")
-        inputEndValue.onTextChanged { endValue ->
+        binding.inputEndValue.setText("$endValue")
+        binding.inputEndValue.onTextChanged { endValue ->
             if (endValue.isNotEmpty()) {
                 this.endValue = endValue.toInt()
                 settingsManager.saveEndValue(endValue.toInt())
             }
         }
 
-        inputDecreaseStep.setText("$decreaseStep")
-        inputDecreaseStep.onTextChanged { decreaseStep ->
+        binding.inputDecreaseStep.setText("$decreaseStep")
+        binding.inputDecreaseStep.onTextChanged { decreaseStep ->
             if (decreaseStep.isNotEmpty()) {
                 this.decreaseStep = decreaseStep.toInt()
                 settingsManager.saveDecreaseStep(decreaseStep.toInt())
             }
         }
 
-        inputDecreaseInterval.setText("$decreaseInterval")
-        inputDecreaseInterval.onTextChanged { decreaseInterval ->
+        binding.inputDecreaseInterval.setText("$decreaseInterval")
+        binding.inputDecreaseInterval.onTextChanged { decreaseInterval ->
             if (decreaseInterval.isNotEmpty()) {
                 this.decreaseInterval = decreaseInterval.toInt()
                 settingsManager.saveDecreaseInterval(decreaseInterval.toInt())
             }
         }
 
-        buttonCreateSession.onClick {
+        binding.buttonCreateSession.onClick {
             backstack.goTo(ServerLobbyKey(startValue, endValue, decreaseStep, decreaseInterval))
         }
     }
@@ -93,7 +106,7 @@ class CreateSessionView : FrameLayout {
         compositeDisposable += connectionManager.isServerBeingStopped
             .observeOnMain()
             .subscribeBy { isServerBeingStopped ->
-                buttonCreateSession.isEnabled = !isServerBeingStopped
+                binding.buttonCreateSession.isEnabled = !isServerBeingStopped
             }
     }
 

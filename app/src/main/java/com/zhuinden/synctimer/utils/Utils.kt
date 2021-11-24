@@ -26,9 +26,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
 import com.bartoszlipinski.viewpropertyobjectanimator.ViewPropertyObjectAnimator
-import com.zhuinden.simplestack.*
-import com.zhuinden.simplestack.navigator.Navigator
-import com.zhuinden.synctimer.core.navigation.ViewKey
+import kotlin.coroutines.cancellation.CancellationException
 
 fun Context.showToast(text: String, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, text, duration).show()
@@ -147,9 +145,10 @@ inline fun createAnimatorListener(
     override fun onAnimationStart(animation: Animator) = onAnimationStart(animation)
 }
 
-inline fun AnimatorSet.onAnimationEnd(crossinline onAnimationEnd: (Animator) -> Unit): AnimatorSet = apply {
-    addListener(createAnimatorListener(onAnimationEnd = onAnimationEnd))
-}
+inline fun AnimatorSet.onAnimationEnd(crossinline onAnimationEnd: (Animator) -> Unit): AnimatorSet =
+    apply {
+        addListener(createAnimatorListener(onAnimationEnd = onAnimationEnd))
+    }
 
 fun View.animateFadeOut(duration: Long = 325): Animator = run {
     alpha = 1f
@@ -206,61 +205,16 @@ fun View.hide() {
     this.visibility = View.GONE
 }
 
-// navigation helpers
-val View.backstack: Backstack
-    get() = Navigator.getBackstack(context)
-
-fun <T : ViewKey> View.getKey() = Backstack.getKey<T>(context)
-
-val Activity.backstack: Backstack
-    get() = Navigator.getBackstack(this)
-
-fun Backstack.replaceHistory(vararg keys: ViewKey, direction: Int = StateChange.FORWARD) {
-    setHistory(History.from(keys.toList()), direction)
-}
-
-// service helpers
-inline fun <reified T> GlobalServices.Builder.add(service: T, tag: String = T::class.java.name) = apply {
-    this.addService(tag, service as Any)
-}
-
-inline fun <reified T> GlobalServices.Builder.rebind(service: T, tag: String = T::class.java.name) = apply {
-    this.addAlias(tag, service as Any)
-}
-
-inline fun <reified T> ServiceBinder.add(service: T, tag: String = T::class.java.name) {
-    this.addService(tag, service as Any)
-}
-
-inline fun <reified T> ServiceBinder.rebind(service: T, tag: String = T::class.java.name) {
-    this.addAlias(tag, service as Any)
-}
-
-inline fun <reified T> ServiceBinder.get(serviceTag: String = T::class.java.name): T =
-    getService(serviceTag)
-
-inline fun <reified T> ServiceBinder.has(serviceTag: String = T::class.java.name): Boolean =
-    hasService(serviceTag)
-
-inline fun <reified T> ServiceBinder.lookup(serviceTag: String = T::class.java.name): T =
-    lookupService(serviceTag)
-
-inline fun <reified T> ServiceBinder.canFind(serviceTag: String = T::class.java.name): Boolean =
-    canFindService(serviceTag)
-
-inline fun <reified T> Context.lookup(serviceTag: String = T::class.java.name): T =
-    Navigator.lookupService(this, serviceTag)
-
-inline fun <reified T> View.lookup(serviceTag: String = T::class.java.name): T =
-    context.lookup(serviceTag)
-
 // SharedPref helpers
 inline fun SharedPreferences.save(actions: SharedPreferences.Editor.() -> Unit) {
     this.save(false, actions)
 }
 
 @SuppressLint("ApplySharedPref")
-inline fun SharedPreferences.save(immediate: Boolean, actions: SharedPreferences.Editor.() -> Unit) {
+inline fun SharedPreferences.save(
+    immediate: Boolean,
+    actions: SharedPreferences.Editor.() -> Unit
+) {
     this.edit().apply(actions).let { editor ->
         if (immediate) {
             editor.commit()
@@ -270,23 +224,11 @@ inline fun SharedPreferences.save(immediate: Boolean, actions: SharedPreferences
     }
 }
 
-// tuple
-data class Tuple4<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D) {
-    /**
-     * Returns string representation of the [Tuple4] including its [first], [second], [third] and [fourth] values.
-     */
-    public override fun toString(): String = "($first, $second, $third, $fourth)"
+inline fun <T : Any> tryOrNull(block: () -> T): T? = try {
+    block()
+} catch (e: Throwable) {
+    if (e is CancellationException) { // re-throw
+        throw e
+    }
+    null
 }
-
-data class Tuple5<A, B, C, D, E>(val first: A, val second: B, val third: C, val fourth: D, val fifth: E) {
-    /**
-     * Returns string representation of the [Tuple5] including its [first], [second], [third], [fourth] and [fifth] values.
-     */
-    public override fun toString(): String = "($first, $second, $third, $fourth, $fifth)"
-}
-
-infix fun <A, B, C> Pair<A, B>.to(third: C) = Triple(first, second, third)
-
-infix fun <A, B, C, D> Triple<A, B, C>.to(fourth: D) = Tuple4(first, second, third, fourth)
-
-infix fun <A, B, C, D, E> Tuple4<A, B, C, D>.to(fifth: E) = Tuple5(first, second, third, fourth, fifth)

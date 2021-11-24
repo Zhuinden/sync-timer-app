@@ -3,11 +3,11 @@
  */
 package com.zhuinden.synctimer.screens.serverlobby
 
+import com.xwray.groupie.GroupieViewHolder
+import com.xwray.groupie.Item
 import com.zhuinden.synctimer.R
-import com.zhuinden.synctimer.utils.GroupieItem
-import com.zhuinden.synctimer.utils.GroupieViewHolder
 
-class ServerLobbySessionMemberEmptyViewItem : GroupieItem() {
+class ServerLobbySessionMemberEmptyViewItem : Item<GroupieViewHolder>() {
     override fun getId(): Long = -1274817L
     override fun equals(other: Any?): Boolean = other is ServerLobbySessionMemberEmptyViewItem
     override fun hashCode(): Int = -123145

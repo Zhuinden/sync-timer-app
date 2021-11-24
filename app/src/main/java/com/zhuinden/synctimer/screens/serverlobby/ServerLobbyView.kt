@@ -10,20 +10,30 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.xwray.groupie.Group
+import com.xwray.groupie.GroupieAdapter
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.core.navigation.BackHandler
 import com.zhuinden.synctimer.core.networking.SessionType
+import com.zhuinden.synctimer.databinding.ServerLobbyViewBinding
 import com.zhuinden.synctimer.features.server.ServerLobbyManager
 import com.zhuinden.synctimer.screens.synctimer.SyncTimerKey
-import com.zhuinden.synctimer.utils.*
+import com.zhuinden.synctimer.utils.onClick
+import com.zhuinden.synctimer.utils.showToast
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.plusAssign
 import io.reactivex.rxkotlin.subscribeBy
-import kotlinx.android.synthetic.main.server_lobby_view.view.*
 
 class ServerLobbyView : FrameLayout, BackHandler {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -32,7 +42,9 @@ class ServerLobbyView : FrameLayout, BackHandler {
         defStyleRes
     )
 
-    private val serverLobbyManager by lazy { lookup<ServerLobbyManager>() }
+    private lateinit var binding: ServerLobbyViewBinding
+
+    private val serverLobbyManager by lazy { backstack.lookup<ServerLobbyManager>() }
 
     private val adapter = GroupieAdapter()
 
@@ -41,22 +53,30 @@ class ServerLobbyView : FrameLayout, BackHandler {
 
         if (isInEditMode) return
 
-        recyclerSessionMembers.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        binding = ServerLobbyViewBinding.bind(this)
 
-        buttonStartTimer.onClick {
+        binding.recyclerSessionMembers.layoutManager =
+            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+
+        binding.buttonStartTimer.onClick {
             // TODO: this all belongs outside of the view
             serverLobbyManager.startTimerForAllPlayers(failure = { err ->
                 showToast("Could not start all timers. Aborting...")
                 backstack.jumpToRoot()
             }, success = {
-                backstack.goTo(SyncTimerKey(SessionType.SERVER, serverLobbyManager.timerConfiguration))
+                backstack.goTo(
+                    SyncTimerKey(
+                        SessionType.SERVER,
+                        serverLobbyManager.timerConfiguration
+                    )
+                )
             })
         }
 
-        textHostIpAddress.text = serverLobbyManager.getNextIp()
+        binding.textHostIpAddress.text = serverLobbyManager.getNextIp()
 
-        buttonNextIpAddress.onClick {
-            textHostIpAddress.text = serverLobbyManager.getNextIp()
+        binding.buttonNextIpAddress.onClick {
+            binding.textHostIpAddress.text = serverLobbyManager.getNextIp()
         }
     }
 
@@ -68,16 +88,17 @@ class ServerLobbyView : FrameLayout, BackHandler {
         if (isInEditMode) return
 
         compositeDisposable += serverLobbyManager.sessions.subscribeBy { members ->
-            adapter.replaceItemsWith {
+            adapter.replaceAll(mutableListOf<Group>().apply {
                 if (members.isEmpty()) {
                     add(ServerLobbySessionMemberEmptyViewItem())
                 } else {
                     addAll(members.map { ServerLobbySessionMemberItem(it) })
                 }
-            }
-            recyclerSessionMembers.adapter = adapter
+            })
+            binding.recyclerSessionMembers.adapter = adapter
 
-            buttonStartTimer.isEnabled = true // enable ability to start timer, we support connecting later
+            binding.buttonStartTimer.isEnabled =
+                true // enable ability to start timer, we support connecting later
         }
     }
 

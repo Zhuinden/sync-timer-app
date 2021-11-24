@@ -63,7 +63,8 @@ class SyncTimerManager(
             stoppingPlayer.takeIf { it.isNotEmpty() } != null,
             isTimerStarted,
             isTimerPaused,
-            isTimerReachedEnd)
+            isTimerReachedEnd,
+        )
     }
 
     class ConfirmationEvent(val onPositiveClick: () -> Unit)

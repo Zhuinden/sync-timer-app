@@ -7,17 +7,22 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.zhuinden.simplestackextensions.navigatorktx.backstack
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import com.zhuinden.synctimer.databinding.SettingsViewBinding
 import com.zhuinden.synctimer.features.settings.SettingsManager
-import com.zhuinden.synctimer.utils.backstack
-import com.zhuinden.synctimer.utils.lookup
 import com.zhuinden.synctimer.utils.onClick
 import com.zhuinden.synctimer.utils.onTextChanged
-import kotlinx.android.synthetic.main.settings_view.view.*
 
 class SettingsView : FrameLayout {
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     @TargetApi(21)
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int, defStyleRes: Int) : super(
         context,
@@ -26,22 +31,26 @@ class SettingsView : FrameLayout {
         defStyleRes
     )
 
+    private lateinit var binding: SettingsViewBinding
+
     private var username: String = ""
 
-    private val settingsManager by lazy { lookup<SettingsManager>() }
+    private val settingsManager by lazy { backstack.lookup<SettingsManager>() }
 
     override fun onFinishInflate() {
         super.onFinishInflate()
 
-        inputUsername.onTextChanged { text ->
+        binding = SettingsViewBinding.bind(this)
+
+        binding.inputUsername.onTextChanged { text ->
             username = text
-            buttonSaveChanges.isEnabled = text.isNotEmpty()
+            binding.buttonSaveChanges.isEnabled = text.isNotEmpty()
         }
 
         username = settingsManager.getUsername()!!
-        inputUsername.setText(username)
+        binding.inputUsername.setText(username)
 
-        buttonSaveChanges.onClick {
+        binding.buttonSaveChanges.onClick {
             settingsManager.saveUsername(username)
             backstack.jumpToRoot()
         }

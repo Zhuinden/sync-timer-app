@@ -4,6 +4,10 @@
 package com.zhuinden.synctimer.screens.synctimer
 
 import com.zhuinden.simplestack.ServiceBinder
+import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.get
+import com.zhuinden.simplestackextensions.servicesktx.lookup
+import com.zhuinden.simplestackextensions.servicesktx.rebind
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.ViewKey
 import com.zhuinden.synctimer.core.networking.ConnectionManager
@@ -14,11 +18,7 @@ import com.zhuinden.synctimer.features.client.JoinSessionManager
 import com.zhuinden.synctimer.features.server.ServerLobbyManager
 import com.zhuinden.synctimer.features.settings.SettingsManager
 import com.zhuinden.synctimer.features.timer.SyncTimerManager
-import com.zhuinden.synctimer.utils.add
-import com.zhuinden.synctimer.utils.get
-import com.zhuinden.synctimer.utils.lookup
-import com.zhuinden.synctimer.utils.rebind
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SyncTimerKey(

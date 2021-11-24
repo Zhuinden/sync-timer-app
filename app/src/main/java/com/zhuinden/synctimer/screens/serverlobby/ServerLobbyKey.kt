@@ -4,15 +4,15 @@
 package com.zhuinden.synctimer.screens.serverlobby
 
 import com.zhuinden.simplestack.ServiceBinder
+import com.zhuinden.simplestackextensions.servicesktx.add
+import com.zhuinden.simplestackextensions.servicesktx.lookup
 import com.zhuinden.synctimer.R
 import com.zhuinden.synctimer.core.navigation.ViewKey
 import com.zhuinden.synctimer.core.scoping.ScopeConfiguration
 
 import com.zhuinden.synctimer.core.timer.TimerConfiguration
 import com.zhuinden.synctimer.features.server.ServerLobbyManager
-import com.zhuinden.synctimer.utils.add
-import com.zhuinden.synctimer.utils.lookup
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ServerLobbyKey(
@@ -28,7 +28,7 @@ data class ServerLobbyKey(
             startValue,
             endValue,
             decreaseStep,
-            decreaseInterval
+            decreaseInterval,
         )
     )
 
@@ -37,7 +37,13 @@ data class ServerLobbyKey(
     override fun bindServices(serviceBinder: ServiceBinder) {
         with(serviceBinder) {
             val key = serviceBinder.getKey<ServerLobbyKey>()
-            add(ServerLobbyManager(lookup(), lookup(), key.timerConfiguration))
+            add(
+                ServerLobbyManager(
+                    settingsManager = lookup(),
+                    connectionManager = lookup(),
+                    timerConfiguration = key.timerConfiguration,
+                )
+            )
         }
     }
 }
