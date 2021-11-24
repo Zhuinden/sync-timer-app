@@ -9,6 +9,7 @@ import android.os.Looper
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.zhuinden.eventemitter.EventEmitter
 import com.zhuinden.eventemitter.EventSource
+import com.zhuinden.rxcombinetuplekt.combineTuple
 import com.zhuinden.synctimer.core.networking.ConnectionManager
 import com.zhuinden.synctimer.core.networking.SessionType
 import com.zhuinden.synctimer.core.networking.commands.StartSessionCommand
@@ -24,7 +25,6 @@ import com.zhuinden.synctimer.utils.RxScopedService
 import com.zhuinden.synctimer.utils.bindToRegistration
 import com.zhuinden.synctimer.utils.observeOnMain
 import io.reactivex.Observable
-import io.reactivex.rxkotlin.Observables
 import io.reactivex.rxkotlin.subscribeBy
 
 class SyncTimerManager(
@@ -50,13 +50,13 @@ class SyncTimerManager(
     private val mutableIsTimerPaused: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
     private val mutableIsTimerReachedEnd: BehaviorRelay<Boolean> = BehaviorRelay.createDefault(false)
 
-    val timerState: Observable<TimerState> = Observables.combineLatest(
+    val timerState: Observable<TimerState> = combineTuple(
         mutableCurrentTime,
         mutableStoppingPlayer,
         mutableIsTimerStarted,
         mutableIsTimerPaused,
         mutableIsTimerReachedEnd
-    ) { currentTime: Int, stoppingPlayer: String, isTimerStarted: Boolean, isTimerPaused: Boolean, isTimerReachedEnd: Boolean ->
+    ).map { (currentTime: Int, stoppingPlayer: String, isTimerStarted: Boolean, isTimerPaused: Boolean, isTimerReachedEnd: Boolean) ->
         TimerState(
             currentTime,
             stoppingPlayer,
