@@ -118,7 +118,9 @@ class JoinSessionManager(
 
     fun sendCommandToHost(command: Any) {
         connectionManager.handler.post {
-            connectionManager.activeClient.sendTCP(command)
+            tryOrNull {
+                connectionManager.activeClient.sendTCP(command)
+            }
         }
     }
 }
