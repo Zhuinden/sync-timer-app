@@ -8,7 +8,7 @@ import android.preference.PreferenceManager
 import com.zhuinden.simplestack.GlobalServices
 import com.zhuinden.simplestackextensions.servicesktx.add
 import com.zhuinden.synctimer.core.networking.ConnectionManager
-import com.zhuinden.synctimer.features.settings.SettingsManager
+import com.zhuinden.synctimer.features.start.settings.SettingsManager
 
 class CustomApplication : Application() {
     lateinit var globalServices: GlobalServices

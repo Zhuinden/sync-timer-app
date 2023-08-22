@@ -14,7 +14,7 @@ import com.zhuinden.synctimer.core.navigation.BackHandler
 import com.zhuinden.synctimer.core.navigation.SyncTimerKeyFilter
 import com.zhuinden.synctimer.core.scoping.ScopeConfiguration
 import com.zhuinden.synctimer.databinding.ActivityMainBinding
-import com.zhuinden.synctimer.screens.splash.SplashKey
+import com.zhuinden.synctimer.features.start.splash.SplashKey
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding

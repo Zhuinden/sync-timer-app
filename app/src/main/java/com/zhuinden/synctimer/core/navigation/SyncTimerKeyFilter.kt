@@ -4,9 +4,9 @@
 package com.zhuinden.synctimer.core.navigation
 
 import com.zhuinden.simplestack.KeyFilter
-import com.zhuinden.synctimer.screens.clientlobby.ClientLobbyKey
-import com.zhuinden.synctimer.screens.serverlobby.ServerLobbyKey
-import com.zhuinden.synctimer.screens.synctimer.SyncTimerKey
+import com.zhuinden.synctimer.features.client.clientlobby.ClientLobbyKey
+import com.zhuinden.synctimer.features.server.serverlobby.ServerLobbyKey
+import com.zhuinden.synctimer.features.synctimer.SyncTimerKey
 
 class SyncTimerKeyFilter : KeyFilter {
     override fun filterHistory(restoredKeys: MutableList<Any>): MutableList<Any> {
